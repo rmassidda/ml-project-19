@@ -1,0 +1,5 @@
+material/
+env/
+brainstorming*
+*.pyc
+__pycache__
