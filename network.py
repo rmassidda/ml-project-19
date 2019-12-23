@@ -5,9 +5,10 @@ class Network:
     # topology      list containing the number of units per layer
     # activation    name of the activation function
     # eta           step size
-    def __init__(self,topology,activation,eta=0.05):
+    def __init__(self,topology,activation='tanh',eta=0.05,minibatch=32):
         self.layers = []
         self.eta = eta
+        self.minibatch = minibatch
         self.activation = activation
         for i in range(1,len(topology)):
             self.layers.append(Layer(topology[i-1],topology[i],activation))
@@ -17,7 +18,7 @@ class Network:
             x = layer.forward(x)
         return x
 
-    def train(self, x, y):
+    def train_single(self, x, y):
         out = self.predict(x)
         sigma = y - out
         for layer in reversed(self.layers):
@@ -28,6 +29,39 @@ class Network:
                 layer.units[j].w  = layer.units[j].w + self.eta * delta[j] * layer.units[j].x
             # Preprocessing of sigma
             sigma = delta @ np.array([u.w[1:] for u in layer.units])
+
+    def train(self, x, y):
+        # Initialize the delta for each unit
+        for layer in self.layers:
+            for unit in layer.units:
+                unit.delta = 0
+
+        # Iterate over the examples
+        for p in range(len(x)):
+            out = self.predict(x[p])
+            sigma = y[p] - out
+            for layer in reversed(self.layers):
+                f_prime = np.array([act_dict[self.activation](u.net,True) for u in layer.units])
+                delta = sigma * f_prime
+                # Accumulate the weight changes
+                for j in range(len(layer.units)):
+                    layer.units[j].delta = layer.units[j].delta + delta[j] * layer.units[j].x
+                # Preprocessing of sigma
+                sigma = delta @ np.array([u.w[1:] for u in layer.units])
+
+            # Update the weights
+            if p % self.minibatch == 0:
+                self.update_weights(self.minibatch)
+
+        # Update over the remaining examples
+        if p % self.minibatch != 0:
+            self.update_weights(p%self.minibatch)
+
+    def update_weights(self,size):
+        for layer in self.layers:
+            for unit in layer.units:
+                unit.w = unit.w + self.eta * unit.delta / size
+                unit.delta = 0
 
 class Layer:
     # n number of units in the previous layer
