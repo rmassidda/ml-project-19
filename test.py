@@ -1,4 +1,4 @@
-from network2 import Network
+from network import Network
 import numpy as np
 
 # XOR test
