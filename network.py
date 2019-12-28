@@ -86,16 +86,23 @@ class Network:
                     grad_b = [gb+gbp for gb, gbp in zip(grad_b, grad_bp)]
                     grad_w = [gw+gwp for gw, gwp in zip(grad_w, grad_wp)]
                 self.step(grad_b, grad_w, len(x_batch))
-            loss = self.compute_loss(x, y)
-            print("Epoch: %d Loss: %f" % (epoch + 1, loss))
+            # loss = self.compute_loss(x, y)
+            # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
 
-    def compute_loss(self, x, y):
+    def compute_mse(self, x, y):
         loss = 0
         # TODO: vectorize
         for i in range(len(x)):
             pred_y = self.predict(x[i])
             loss += (pred_y - y[i])**2
         return loss / len(x)
+
+    def compute_misclassified(self, x, y):
+        err = 0
+        for i in range(len(x)):
+            if (y[i] > 0.5) != (self.predict(x[i]) > 0.5):
+                err += 1
+        return err / len(x)
 
     def forward_pass(self, x):
         """Computes a forward pass and returns nets and activations for each layer."""
