@@ -6,9 +6,10 @@ import numpy as np
 import sys
 
 class Validation:
-    def __init__(self,train_x,train_y,verbose=True):
+    def __init__(self,train_x,train_y,loss,verbose=True):
         self.train_x = train_x
         self.train_y = train_y
+        self.loss = loss
         self.verbose = verbose
 
     def hold_out(self,par):
@@ -22,7 +23,7 @@ class Validation:
         valid_x = self.train_x[bound:]
         valid_y = self.train_y[bound:]
 
-        estimated_risk = nn.compute_misclassified(valid_x,valid_y)
+        estimated_risk = nn.error(valid_x,valid_y,self.loss)
         return par,estimated_risk
 
     def model_selection(self,hp):
@@ -49,7 +50,7 @@ class Validation:
             print("=== MODEL ASSESSMENT ===")
         nn = Network(**model)
         nn.train(self.train_x,self.train_y)
-        risk = nn.compute_misclassified(test_x,test_y)
+        risk = nn.error(test_x,test_y,self.loss)
         if self.verbose:
             print(model, risk,sep='\t')
         return risk

@@ -1,4 +1,5 @@
 from validation import Validation
+from utils import onehot, misclassification_loss
 import numpy as np
 import sys
 
@@ -22,6 +23,6 @@ hp = [{
     }]
 
 # Validation
-val = Validation(train_x,train_y)
+val = Validation(train_x,train_y,misclassification_loss)
 model = val.model_selection(hp)
 risk = val.model_assessment(model,test_x,test_y)

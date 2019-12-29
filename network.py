@@ -89,19 +89,10 @@ class Network:
             # loss = self.compute_loss(x, y)
             # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
 
-    def compute_mse(self, x, y):
-        loss = 0
-        # TODO: vectorize
-        for i in range(len(x)):
-            pred_y = self.predict(x[i])
-            loss += (pred_y - y[i])**2
-        return loss / len(x)
-
-    def compute_misclassified(self, x, y):
+    def error(self, x, y, loss):
         err = 0
         for i in range(len(x)):
-            if (y[i] > 0.5) != (self.predict(x[i]) > 0.5):
-                err += 1
+            err += loss(self.predict(x[i]),y[i])
         return err / len(x)
 
     def forward_pass(self, x):
