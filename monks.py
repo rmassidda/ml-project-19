@@ -6,12 +6,7 @@ import numpy as np
 import sys
 
 def validate(par):
-    nn = Network(
-            [17, par['hidden_units'], 1],
-            activation='sigmoid',
-            eta=par['eta'],
-            minibatch=par['minibatch'],
-            epochs=500)
+    nn = Network(**par,epochs=500)
 
     # Split with validation set (75/25)
     bound = int(len(train_x)*(3/4))
@@ -34,9 +29,9 @@ train_y = np.genfromtxt(train_fp,usecols=(0))
 
 # Hyperparameters
 hp = [{
-        'minibatch': [1,16,32],
-        'eta': [1e-1,1e-2,1e-4],
-        'hidden_units': [1,2,4,8]
+    'minibatch': [1,16,32],
+    'eta': [1e-1,1e-2,1e-4],
+    'topology': [[17,1,1],[17,2,1],[17,4,1],[17,8,1]]
     }]
 
 # Model selection
@@ -55,12 +50,7 @@ with ThreadPoolExecutor(max_workers=8) as executor:
             best = p[0]
 
 # Train on the best model
-nn = Network(
-        [17, best['hidden_units'], 1],
-        activation='sigmoid',
-        eta=best['eta'],
-        minibatch=best['minibatch'],
-        epochs=500)
+nn = Network(**best,epochs=500)
 nn.train(train_x,train_y)
 
 raw_x = np.genfromtxt(test_fp,usecols=(1,2,3,4,5,6))
