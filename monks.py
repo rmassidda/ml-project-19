@@ -18,11 +18,21 @@ test_y = np.genfromtxt(test_fp,usecols=(0))
 # Hyperparameters
 hp = [{
     'minibatch': [1,16,32],
-    'eta': [1e-1,1e-2,1e-4],
-    'topology': [[17,1,1],[17,2,1],[17,4,1],[17,8,1]]
+    'eta': [1e-1,1e-2],
+    'topology': [[17,1,1],[17,2,1],[17,4,1]],
+    'epochs': [500]
     }]
 
 # Validation
-val = Validation(train_x,train_y,misclassification_loss)
-model = val.model_selection(hp)
-risk = val.model_assessment(model,test_x,test_y)
+val = Validation(misclassification_loss,verbose=False)
+
+model_ho = val.model_selection(hp,train_x,train_y,0)
+risk_ho = val.estimate_test(model_ho,train_x,train_y,test_x,test_y)
+print('Hold-out produced', model_ho, risk_ho)
+
+model_cv = val.model_selection(hp,train_x,train_y,5)
+risk_cv = val.estimate_test(model_cv,train_x,train_y,test_x,test_y)
+print('Cross-Validation produced', model_cv, risk_cv)
+
+double_cv = val.double_cross_validation(train_x,train_y,hp,5,5)
+print('Double Cross-Validation risk estimation', double_cv)
