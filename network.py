@@ -1,7 +1,6 @@
 import numpy as np
 from utils import shuffle, loss_dict
 from activation import act_dict
-from matplotlib import pyplot as plt
 
 class Network:
     """An artificial neural network based on the multilayer perceptron architecture.
@@ -98,7 +97,6 @@ class Network:
 
     def train(self, x, y):
         """Trains a neural network on a dataset."""
-        epoch_x = []
         loss_y = []
         self.initialize()
         for epoch in range(self.epochs):
@@ -121,11 +119,9 @@ class Network:
                     grad_w = [gw+gwp for gw, gwp in zip(grad_w, grad_wp)]
                 self.step(grad_b, grad_w, len(x_batch))
             loss = self.error(x, y, loss_dict['MSE'])
-            epoch_x.append(epoch + 1)
             loss_y.append(loss)
             # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
-        plt.plot(epoch_x, loss_y, color="red")
-        plt.show()
+        return loss_y
 
     def error(self, x, y, loss):
         err = 0

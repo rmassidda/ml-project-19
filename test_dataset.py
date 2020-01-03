@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from network import Network
 import pandas as pd
 
@@ -16,4 +17,6 @@ epochs = 100
 
 nn = Network([n_inputs, hidden_units, n_outputs], activations=activations, minibatch=batch_size,
              eta=eta, epochs=epochs)
-nn.train(x, y)
+loss_y = nn.train(x, y)
+plt.plot(loss_y, color="red")
+plt.show()

@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from network import Network
 import numpy as np
 
@@ -18,7 +19,9 @@ elif activations[-1] == 'sigmoid':
 
 nn = Network([2, hidden_units, 1],  activations=activations, minibatch=batch_size,
              eta=eta, epochs=epochs)
-nn.train(x, y)
+loss_y = nn.train(x, y)
+plt.plot(loss_y, color="red")
+plt.show()
 
 print('------')
 print('XOR predictions:')
