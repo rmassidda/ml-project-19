@@ -1,5 +1,5 @@
 import numpy as np
-from utils import shuffle
+from utils import shuffle, loss_dict
 from activation import act_dict
 from matplotlib import pyplot as plt
 
@@ -76,7 +76,7 @@ class Network:
         # Init weights moving averages
         self.V_dw = []
         for i in range(self.n_layers - 1):
-            self.V_dw.append(np.zeros(self.topology[i+1], self.topology[i]))
+            self.V_dw.append(np.zeros((self.topology[i+1], self.topology[i])))
 
         # Init biases moving averages
         self.V_db = []
@@ -120,27 +120,17 @@ class Network:
                     grad_b = [gb+gbp for gb, gbp in zip(grad_b, grad_bp)]
                     grad_w = [gw+gwp for gw, gwp in zip(grad_w, grad_wp)]
                 self.step(grad_b, grad_w, len(x_batch))
-            loss = self.compute_loss(x, y)
+            loss = self.error(x, y, loss_dict['MSE'])
             epoch_x.append(epoch + 1)
             loss_y.append(loss)
-            print("Epoch: %d Loss: %f" % (epoch + 1, loss))
+            # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
         plt.plot(epoch_x, loss_y, color="red")
         plt.show()
 
-    def compute_loss(self, x, y):
-        """Computes MSE loss."""
-        loss = 0
-        # TODO: vectorize
-        for i in range(len(x)):
-            pred_y = self.predict(x[i])
-            loss += np.mean((pred_y - y[i])**2)
-        return loss / len(x)
-
-    def compute_misclassified(self, x, y):
+    def error(self, x, y, loss):
         err = 0
         for i in range(len(x)):
-            if (y[i] > 0.5) != (self.predict(x[i]) > 0.5):
-                err += 1
+            err += loss(self.predict(x[i]),y[i])
         return err / len(x)
 
     def forward_pass(self, x):
