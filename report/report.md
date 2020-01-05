@@ -8,7 +8,7 @@ bibliography: ml-2019.bib
 \title{An Astonishing Title}
 \author{
   Emanuele Cosenza \\ 
-  \href{mailto:e.cosenza@studenti.unipi.it}{e.cosenza@studenti.unipi.it} 
+  \href{mailto:e.cosenza3@studenti.unipi.it}{e.cosenza@studenti.unipi.it} 
   \and Riccardo Massidda \\ 
   \href{mailto:r.massidda@studenti.unipi.it}{r.massidda@studenti.unipi.it}
 }
