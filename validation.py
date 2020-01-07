@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from grid import Grid
 from network import Network
-from utils import onehot
+from utils import onehot, shuffle
 import numpy as np
 import sys
 
@@ -23,8 +23,8 @@ class Validation:
     def hold_out(self,model,x,y,prop=0.75):
         bound = int(len(x)*prop)        
         nn = Network(**model)
-        nn.train(x[:bound],y[:bound])
-        return nn.error(x[bound:],y[bound:],self.loss)
+        tr_loss, vl_loss, epoch = nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
+        return (vl_loss[epoch], epoch)
 
     """
     Cross-Validation
@@ -42,12 +42,13 @@ class Validation:
             vl_x = x[rows]
             vl_y = y[rows]
             nn = Network(**model)
-            nn.train(tr_x,tr_y)
-            return nn.error(vl_x,vl_y,self.loss)
+            tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y)
+            return (vl_loss[epoch], epoch)
 
-        risk = map(estimate,range(k))
-
-        return sum(risk)/k
+        folds = list(map(estimate,range(k)))
+        error = sum([loss for loss,epoch in folds])/k
+        epoch = round(sum([epoch for loss,epoch in folds])/k)
+        return (error, epoch)
 
     """
     Model selection
@@ -58,6 +59,9 @@ class Validation:
         grid = Grid(hp)
         risk = np.Inf
         best = None
+
+        # Avoid order bias
+        x, y = shuffle(x, y)
         
         # Parallel grid search
         if k < 2:
@@ -65,12 +69,27 @@ class Validation:
         else:
             res = self.executor.map(lambda p: self.cross_validation(p,x,y,k),grid)
 
-        for p in zip(grid,res):
+        for p, r in zip(grid,res):
             if self.verbose:
-                print(p,sep='\t')
-            if p[1] < risk:
-                best = p[0]
-                risk = p[1]
+                print(p,r,sep='\t')
+
+            """
+            Each item in the list of results per
+            hyperparameter combination is a tuple
+            where the first element is the error
+            on the validation set, while the other
+            is the number of optimal epochs chose
+            via early stopping.
+            r[0]     validation error
+            r[1]     epoch
+            """
+            if r[0] < risk:
+                """
+                Merge of the dictionary of hyperparameters
+                with the optimal epochs.
+                """
+                best = {**p, 'epochs': r[1] }
+                risk = r[0]
 
         """
         NOTE: after the selection of the "best model" the

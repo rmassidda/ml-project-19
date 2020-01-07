@@ -95,7 +95,7 @@ class Network:
             x = f(x)
         return x
 
-    def train(self, x, y):
+    def train(self, x, y, val_x=None, val_y=None):
         """Trains a neural network on a dataset."""
         loss_y = []
         self.initialize()
@@ -121,7 +121,7 @@ class Network:
             loss = self.error(x, y, loss_dict['MSE'])
             loss_y.append(loss)
             # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
-        return loss_y
+        return loss_y, loss_y, len(loss_y)-1
 
     def error(self, x, y, loss):
         err = 0
