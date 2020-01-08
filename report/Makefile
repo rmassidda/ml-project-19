@@ -1,5 +1,5 @@
 BIB = --bibliography ml-2019.bib
-STYLE = --csl https://raw.githubusercontent.com/citation-style-language/styles/master/nature.csl
+STYLE = --csl nature.csl
 
 report: report.md
 	pandoc ${BIB} ${STYLE} -o $@.pdf $^

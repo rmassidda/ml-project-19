@@ -1,10 +1,4 @@
 
-@online{noauthor_numpy_nodate,
-	title = {{NumPy} — {NumPy}},
-	url = {https://numpy.org/},
-	urldate = {2019-12-27},
-}
-
 @book{rumelhart_parallel_1986,
 	location = {Cambridge, Mass},
 	title = {Parallel distributed processing: explorations in the microstructure of cognition},
@@ -18,4 +12,42 @@
 	editoratype = {collaborator},
 	date = {1986},
 	keywords = {Cognition, Human information processing}
+}
+
+@book{oliphant_guide_2015,
+	location = {Austin, Tex.},
+	title = {Guide to {NumPy}},
+	isbn = {978-1-5173-0007-4},
+	publisher = {Continuum Press},
+	author = {Oliphant, Travis E},
+	date = {2015},
+	note = {{OCLC}: 982090469}
+}
+
+@article{glorot_understanding_nodate,
+	title = {Understanding the difﬁculty of training deep feedforward neural networks},
+	abstract = {Whereas before 2006 it appears that deep multilayer neural networks were not successfully trained, since then several algorithms have been shown to successfully train them, with experimental results showing the superiority of deeper vs less deep architectures. All these experimental results were obtained with new initialization or training mechanisms. Our objective here is to understand better why standard gradient descent from random initialization is doing so poorly with deep neural networks, to better understand these recent relative successes and help design better algorithms in the future. We ﬁrst observe the inﬂuence of the non-linear activations functions. We ﬁnd that the logistic sigmoid activation is unsuited for deep networks with random initialization because of its mean value, which can drive especially the top hidden layer into saturation. Surprisingly, we ﬁnd that saturated units can move out of saturation by themselves, albeit slowly, and explaining the plateaus sometimes seen when training neural networks. We ﬁnd that a new non-linearity that saturates less can often be beneﬁcial. Finally, we study how activations and gradients vary across layers and during training, with the idea that training may be more difﬁcult when the singular values of the Jacobian associated with each layer are far from 1. Based on these considerations, we propose a new initialization scheme that brings substantially faster convergence.},
+	pages = {8},
+	author = {Glorot, Xavier and Bengio, Yoshua},
+	langid = {english}
+}
+
+@article{prechelt_early_nodate,
+	title = {Early Stopping {\textbar} but when?},
+	abstract = {Validation can be used to detect when over tting starts during supervised training of a neural network; training is then stopped before convergence to avoid the over tting   early stopping" . The exact criterion used for validation-based early stopping, however, is usually chosen in an ad-hoc fashion or training is stopped interactively. This trick describes how to select a stopping criterion in a systematic fashion; it is a trick for either speeding learning procedures or improving generalization, whichever is more important in the particular situation. An empirical investigation on multi-layer perceptrons shows that there exists a tradeo between training time and generalization: From the given mix of 1296 training runs using di erent 12 problems and 24 di erent network architectures I conclude slower stopping criteria allow for small improvements in generalization  here: about 4  on average , but cost much more training time  here: about factor 4 longer on average .},
+	pages = {15},
+	author = {Prechelt, Lutz},
+	langid = {english}
+}
+
+@book{goodfellow_deep_2016,
+	location = {Cambridge, Massachusetts},
+	title = {Deep learning},
+	isbn = {978-0-262-03561-3},
+	series = {Adaptive computation and machine learning},
+	pagetotal = {775},
+	publisher = {The {MIT} Press},
+	author = {Goodfellow, Ian and Bengio, Yoshua and Courville, Aaron},
+	date = {2016},
+	keywords = {Machine learning}
 }
