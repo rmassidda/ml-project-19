@@ -1,53 +1,57 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from grid import Grid
 from network import Network
 from utils import shuffle
 import numpy as np
+import functools
 
-class Validation:
-    def __init__(self,loss,workers=16,verbose=True):
-        self.loss = loss
-        self.executor = ThreadPoolExecutor(max_workers=workers)
-        self.verbose = verbose
+"""
+Hold-Out
+Procedure used for model selection, given a model
+and a data set, it partitions it in training and
+validation set by default using 75/25% proportion.
+It returns the empirical risk computed on the
+validation set of a network trained on the
+training set.
+"""
+def hold_out(model,x,y,prop=0.75):
+    bound = int(len(x)*prop)        
+    nn = Network(**model)
+    tr_loss, vl_loss, epoch = nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
+    return (vl_loss[epoch], epoch)
 
-    """
-    Hold-Out
-    Procedure used for model selection, given a model
-    and a data set, it partitions it in training and
-    validation set by default using 75/25% proportion.
-    It returns the empirical risk computed on the
-    validation set of a network trained on the
-    training set.
-    """
-    def hold_out(self,model,x,y,prop=0.75):
-        bound = int(len(x)*prop)        
+"""
+Cross-Validation
+Given a model and a dataset it partitions it
+by using the K-Hold CV algorithm.
+It the returns the empirical risk.
+"""
+def cross_validation(model,x,y,k=5):
+    batch = np.int64(np.floor(len(x)/k))
+
+    def estimate(i):
+        rows = range(i*batch,(i+1)*batch)
+        tr_x = np.delete(x,rows,0)
+        tr_y = np.delete(y,rows,0)
+        vl_x = x[rows]
+        vl_y = y[rows]
         nn = Network(**model)
-        tr_loss, vl_loss, epoch = nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
+        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y)
         return (vl_loss[epoch], epoch)
 
-    """
-    Cross-Validation
-    Given a model and a dataset it partitions it
-    by using the K-Hold CV algorithm.
-    It the returns the empirical risk.
-    """
-    def cross_validation(self,model,x,y,k=5):
-        batch = np.int64(np.floor(len(x)/k))
+    folds = list(map(estimate,range(k)))
+    error = sum([loss for loss,epoch in folds])/k
+    epoch = round(sum([epoch for loss,epoch in folds])/k)
+    return (error, epoch)
 
-        def estimate(i):
-            rows = range(i*batch,(i+1)*batch)
-            tr_x = np.delete(x,rows,0)
-            tr_y = np.delete(y,rows,0)
-            vl_x = x[rows]
-            vl_y = y[rows]
-            nn = Network(**model)
-            tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y)
-            return (vl_loss[epoch], epoch)
-
-        folds = list(map(estimate,range(k)))
-        error = sum([loss for loss,epoch in folds])/k
-        epoch = round(sum([epoch for loss,epoch in folds])/k)
-        return (error, epoch)
+class Validation:
+    def __init__(self,loss,workers=16,threads=False,verbose=True):
+        self.loss = loss
+        if threads:
+            self.executor = ThreadPoolExecutor(max_workers=workers)
+        else:
+            self.executor = ProcessPoolExecutor(max_workers=workers)
+        self.verbose = verbose
 
     """
     Model selection
@@ -63,10 +67,17 @@ class Validation:
         x, y = shuffle(x, y)
         
         # Parallel grid search
-        if k < 2:
-            res = self.executor.map(lambda p: self.hold_out(p,x,y),grid)
-        else:
-            res = self.executor.map(lambda p: self.cross_validation(p,x,y,k),grid)
+        if isinstance(self.executor,ThreadPoolExecutor):
+            if k < 2:
+                res = self.executor.map(lambda p: hold_out(p,x,y),grid)
+            else:
+                res = self.executor.map(lambda p: cross_validation(p,x,y,k),grid)
+        elif isinstance(self.executor,ProcessPoolExecutor):
+            if k < 2:
+                p = functools.partial(hold_out,x=x,y=y)
+            else:
+                p = functools.partial(cross_validation,x=x,y=y)
+            res = self.executor.map(p,grid)
 
         for p, r in zip(grid,res):
             if self.verbose:

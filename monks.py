@@ -5,6 +5,7 @@ import sys
 
 train_fp = sys.argv[1]
 test_fp = sys.argv[2]
+par_deg = int(sys.argv[3])
 monk_ranges = [3,3,2,3,4,2]
 
 # Data load
@@ -24,7 +25,7 @@ hp = [{
     }]
 
 # Validation
-val = Validation(misclassification_loss,verbose=False)
+val = Validation(misclassification_loss,workers=par_deg,verbose=False)
 
 model_ho = val.model_selection(hp,train_x,train_y,0)
 risk_ho = val.estimate_test(model_ho,train_x,train_y,test_x,test_y)
