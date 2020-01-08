@@ -1,9 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from grid import Grid
 from network import Network
-from utils import onehot, shuffle
+from utils import shuffle
 import numpy as np
-import sys
 
 class Validation:
     def __init__(self,loss,workers=16,verbose=True):
@@ -94,8 +93,8 @@ class Validation:
         """
         NOTE: after the selection of the "best model" the
         model selection could proceed with a finer coarse
-        grid search over smaller interval and within sele
-        cted hyperparameters
+        grid search over smaller interval and within selected
+        hyperparameters
         """
         return best
 
