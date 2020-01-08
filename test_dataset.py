@@ -24,7 +24,7 @@ batch_size = 32
 hidden_units = 18
 eta = 0.001
 weight_decay = 0
-# Set epochs as None to activate early stopping
+# Set epochs to None to activate early stopping
 epochs = None
 
 # Training
