@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from grid import Grid
 from network import Network
 from utils import shuffle, loss_dict
@@ -6,26 +6,13 @@ import numpy as np
 import functools
 
 """
-Hold-Out
-Procedure used for model selection, given a model
-and a data set, it partitions it in training and
-validation set by default using 75/25% proportion.
-It returns the empirical risk computed on the
-validation set of a network trained on the
-training set.
-"""
-def hold_out(model,x,y,prop=0.75):
-    bound = int(len(x)*prop)        
-    nn = Network(**model)
-    return nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
-
-"""
 Cross-Validation
 Given a model and a dataset it partitions it
 by using the K-Hold CV algorithm.
 It the returns the empirical risk.
 """
-def cross_validation(model,x,y,k=5):
+def cross_validation(model,x,y,loss,k=5):
+    x, y = shuffle(x, y)
     batch = np.int64(np.floor(len(x)/k))
 
     def estimate(i):
@@ -35,7 +22,7 @@ def cross_validation(model,x,y,k=5):
         vl_x = x[rows]
         vl_y = y[rows]
         nn = Network(**model)
-        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y)
+        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,loss)
         return (tr_loss,vl_loss,epoch)
 
     """
@@ -45,53 +32,17 @@ def cross_validation(model,x,y,k=5):
     as the average on the risk per fold.
     """
     folds = list(map(estimate,range(k)))
+    tr_loss = sum([tr_loss[epoch] for tr_loss,vl_loss,epoch in folds])/k
+    vl_loss = sum([vl_loss[epoch] for tr_loss,vl_loss,epoch in folds])/k
     # TODO: floor or ceil?
-    epoch = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
+    epoch   = int(np.ceil(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
 
-    """
-    To plot the result of cross-validation
-    the 'average' over the losses is computed
-    Since the arrays from each fold have different
-    lengths it's not possibile to simply sum them
-    and then divide the result by k.
-    It should be noticed that the only interesting
-    propriety is the fact that, like the epoch is the
-    average of the epochs per fold, the validation risk
-    estimate should be the average over the estimates per
-    fold.
-
-    This value can be computed as
-    """
-    risk  = sum([vl[e] for tr,vl,e in folds])/k
-    """
-    Just for graphical representation motifs we propose
-    the construction of an array of size [1:epoch] used 
-    to construct a sound plot for the error.
-    This is done by averaging the vectors via their relative position:
-    """
-    vl_loss = np.array([sum([vl[int(e*j/epoch)] for tr,vl,e in folds])/k for j in range(epoch+1)])
-    """   
-    This array is also sound for the validation process
-    since it should hold:
-    >>> vl_loss[epoch] == risk
-
-    To avoid numerical issues this is forcefully constrained:
-    """
-    vl_loss[epoch] = risk
-    """
-    Same reasoning and construction is applied for
-    the error in the training set.
-    """
-    tr_loss = np.array([sum([tr[int(e*j/epoch)] for tr,vl,e in folds])/k for j in range(epoch+1)])
     return (tr_loss,vl_loss,epoch)
 
 class Validation:
-    def __init__(self,loss,workers=16,threads=False,verbose=True):
+    def __init__(self,loss,workers=16,verbose=True):
         self.loss = loss
-        if threads:
-            self.executor = ThreadPoolExecutor(max_workers=workers)
-        else:
-            self.executor = ProcessPoolExecutor(max_workers=workers)
+        self.executor = ProcessPoolExecutor(max_workers=workers)
         self.verbose = verbose
 
     """
@@ -104,43 +55,38 @@ class Validation:
     """
     def model_selection(self,hp,x,y,k):
         grid = Grid(hp)
-        risk = np.Inf
 
         # Avoid order bias
         x, y = shuffle(x, y)
         
         # Parallel grid search
-        if isinstance(self.executor,ThreadPoolExecutor):
-            if k < 2:
-                res = self.executor.map(lambda p: hold_out(p,x,y),grid)
-            else:
-                res = self.executor.map(lambda p: cross_validation(p,x,y,k),grid)
-        elif isinstance(self.executor,ProcessPoolExecutor):
-            if k < 2:
-                p = functools.partial(hold_out,x=x,y=y)
-            else:
-                p = functools.partial(cross_validation,x=x,y=y)
-            res = self.executor.map(p,grid)
+        p = functools.partial(cross_validation,x=x,y=y,loss=self.loss,k=k)
+        res = self.executor.map(p,grid)
 
+        model_vl = np.Inf
         for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
-            curr_risk = vl_loss[epoch]
-            if self.verbose:
-                print(p,epoch,curr_risk,sep='\t')
+            # TODO: if eps is set don't add the 'learned' epochs to the model
+            p = {**p, 'epochs': epoch }
 
             """
             Each item in the list of results per
             hyperparameter combination is a triple
             (tr_loss,vl_loss,epoch)
+            The best model is chosen according
+            to the loss on the validation set
             """
-            if curr_risk < risk:
+            if vl_loss < model_vl:
                 """
                 Merge of the dictionary of hyperparameters
                 with the optimal epochs.
                 """
-                best_model = {**p, 'epochs': epoch }
-                best_tr    = tr_loss
-                best_vl    = vl_loss
-                risk = curr_risk
+                model_tr = tr_loss
+                model_vl = vl_loss
+                model    = p
+
+            if self.verbose:
+                print(p,tr_loss,vl_loss,sep='\t')
+
 
         """
         The training and the validation curves of the model are returned.
@@ -149,7 +95,7 @@ class Validation:
         grid search over smaller interval and within selected
         hyperparameters.
         """
-        return (best_tr,best_vl,best_model)
+        return (model_tr,model_vl,model)
 
     """
     Given a model and a dataset a neural network
@@ -171,9 +117,12 @@ class Validation:
     the risk over the family of functions.
     """
     def double_cross_validation(self,x,y,hp,k1,k2):
+        x, y = shuffle(x, y)
         batch = np.int64(np.floor(len(x)/k1))
 
         def estimate(i):
+            if self.verbose:
+                print('External fold ',i)
             rows = range(i*batch,(i+1)*batch)
             tr_x = np.delete(x,rows,0)
             tr_y = np.delete(y,rows,0)
