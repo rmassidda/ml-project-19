@@ -1,5 +1,6 @@
+from matplotlib import pyplot as plt
+from utils import onehot
 from validation import Validation
-from utils import onehot, misclassification_loss
 import numpy as np
 import sys
 
@@ -21,19 +22,27 @@ hp = [{
     'minibatch': [1,16,32],
     'eta': [1e-1,1e-2],
     'topology': [[17,1,1],[17,2,1],[17,4,1]],
-    'epochs': [500]
     }]
 
 # Validation
-val = Validation(misclassification_loss,workers=par_deg,verbose=False)
+val = Validation('MCL',workers=par_deg,verbose=False)
 
-model_ho = val.model_selection(hp,train_x,train_y,0)
-risk_ho = val.estimate_test(model_ho,train_x,train_y,test_x,test_y)
-print('Hold-out produced', model_ho, risk_ho)
+tr_loss, vl_loss, model = val.model_selection(hp,train_x,train_y,0)
+plt.plot(tr_loss, color="green", label='TR')
+plt.plot(vl_loss, color="red", label='VL')
+plt.show()
+tr_loss, te_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
+plt.plot(tr_loss, color="green", label='TR')
+plt.plot(te_loss, color="blue", label='TE')
+plt.show()
+print('Hold-out produced', model, risk)
 
-model_cv = val.model_selection(hp,train_x,train_y,5)
-risk_cv = val.estimate_test(model_cv,train_x,train_y,test_x,test_y)
-print('Cross-Validation produced', model_cv, risk_cv)
+tr_loss, vl_loss, model = val.model_selection(hp,train_x,train_y,5)
+plt.plot(tr_loss, color="green", label='TR')
+plt.plot(vl_loss, color="red", label='VL')
+plt.show()
+tr_loss, vl_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
+print('Cross-Validation produced', model, risk)
 
-double_cv = val.double_cross_validation(train_x,train_y,hp,5,5)
-print('Double Cross-Validation risk estimation', double_cv)
+# double_cv = val.double_cross_validation(train_x,train_y,hp,5,5)
+# print('Double Cross-Validation risk estimation', double_cv)

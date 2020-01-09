@@ -22,7 +22,9 @@ class Network:
     minibatch: int, optional, default: 32
         The batch size used in the minibatch gradient descent algorithm.
     epochs: int, optional, default: 1000
-        The number of epochs of the gradient descent algorithm.
+        The number of epochs to be executed in the training of the network.
+    patience: int, optional, default: 20
+        Patience parameter used in early stopping.
 
     Attributes
     ------
@@ -45,7 +47,8 @@ class Network:
     """
 
     def __init__(self, topology, activations=None, eta=1e-2,
-                 weight_decay=1e-4, momentum=0.9, minibatch=32, epochs=1000):
+                 weight_decay=1e-4, momentum=0.9, minibatch=32,
+                 epochs=None, patience=20):
         self.topology = topology
         self.n_layers = len(topology)
         self.eta = eta
@@ -54,6 +57,8 @@ class Network:
         self.minibatch = minibatch
         self.activations = activations
         self.epochs = epochs
+        self.patience = patience
+
         self.weights = None
         self.biases = None
         self.V_dw = None
@@ -95,33 +100,86 @@ class Network:
             x = f(x)
         return x
 
-    def train(self, x, y, val_x=None, val_y=None):
+    def train(self, x, y, val_x=None, val_y=None, f_loss='MSE', verbose=False):
         """Trains a neural network on a dataset."""
-        loss_y = []
         self.initialize()
-        for epoch in range(self.epochs):
+        tr_losses = []
+        val_losses = []
+
+        early_stopping = True if self.epochs is None and \
+                         val_x is not None and val_y is not None else False
+        if early_stopping:
+            no_improvement = 0
+            best_val_loss = np.Inf
+
+        epoch = 0
+        training = True
+
+        while training:
+
+            epoch += 1
+
+            if verbose:
+                print("Epoch: %d" % epoch)
             # Shuffle dataset in each epoch to avoid order bias
+            # And execute a single epoch 
             x, y = shuffle(x, y)
-            # Iterate over batches
-            for batch_idx in range(0, len(x), self.minibatch):
-                x_batch = x[batch_idx:batch_idx + self.minibatch]
-                y_batch = y[batch_idx:batch_idx + self.minibatch]
-                grad_w = [np.zeros(w.shape) for w in self.weights]
-                grad_b = [np.zeros(b.shape) for b in self.biases]
-                # Iterate over patterns
-                # TODO: vectorize
-                for p in range(len(x_batch)):
-                    # Do a forward pass and backpropagate the error
-                    nets, activations = self.forward_pass(x_batch[p])
-                    grad_bp, grad_wp = self.backpropagate(nets, activations, y_batch[p])
-                    # Accumulate gradients
-                    grad_b = [gb+gbp for gb, gbp in zip(grad_b, grad_bp)]
-                    grad_w = [gw+gwp for gw, gwp in zip(grad_w, grad_wp)]
-                self.step(grad_b, grad_w, len(x_batch))
-            loss = self.error(x, y, loss_dict['MSE'])
-            loss_y.append(loss)
-            # print("Epoch: %d Loss: %f" % (epoch + 1, loss))
-        return loss_y, loss_y, len(loss_y)-1
+
+            # Training
+            self.epoch_train(x, y)
+
+            # Loss on the training set
+            tr_loss = self.error(x, y, loss_dict[f_loss])
+            tr_losses.append(tr_loss)
+            if verbose:
+                print("\tTraining loss: %f" % tr_loss)
+
+            # Loss on the validation set
+            if val_x is not None and val_y is not None:
+                val_loss = self.error(val_x, val_y, loss_dict[f_loss])
+                val_losses.append(val_loss)
+                if verbose:
+                    print("\tValidation loss: %f" % val_loss)
+
+            # Check stop conditions
+            if early_stopping:
+                if val_loss >= best_val_loss:
+                    no_improvement += 1
+                else:
+                    best_val_loss = val_loss
+                    best_epoch = epoch
+                    if no_improvement > 0:
+                        no_improvement = 0 
+                if no_improvement == self.patience:
+                    # Stop training if the nn didn't improve on VL for patience consecutive epochs
+                    training = False
+            else:
+                if epoch == self.epochs:
+                    # Stop training when the prefixed number of epochs has been reached
+                    training = False
+
+        if not early_stopping:
+            best_epoch = epoch
+
+        return np.array(tr_losses), np.array(val_losses), best_epoch - 1
+
+    def epoch_train(self, x, y):
+        # Iterate over batches
+        for batch_idx in range(0, len(x), self.minibatch):
+            x_batch = x[batch_idx:batch_idx + self.minibatch]
+            y_batch = y[batch_idx:batch_idx + self.minibatch]
+            grad_w = [np.zeros(w.shape) for w in self.weights]
+            grad_b = [np.zeros(b.shape) for b in self.biases]
+            # Iterate over patterns
+            # TODO: vectorize
+            for p in range(len(x_batch)):
+                # Do a forward pass and backpropagate the error
+                nets, activations = self.forward_pass(x_batch[p])
+                grad_bp, grad_wp = self.backpropagate(nets, activations, y_batch[p])
+                # Accumulate gradients
+                grad_b = [gb+gbp for gb, gbp in zip(grad_b, grad_bp)]
+                grad_w = [gw+gwp for gw, gwp in zip(grad_w, grad_wp)]
+            self.step(grad_b, grad_w, len(x_batch))
 
     def error(self, x, y, loss):
         err = 0

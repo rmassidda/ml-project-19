@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from grid import Grid
 from network import Network
-from utils import shuffle
+from utils import shuffle, loss_dict
 import numpy as np
 import functools
 
@@ -17,8 +17,7 @@ training set.
 def hold_out(model,x,y,prop=0.75):
     bound = int(len(x)*prop)        
     nn = Network(**model)
-    tr_loss, vl_loss, epoch = nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
-    return (vl_loss[epoch], epoch)
+    return nn.train(x[:bound],y[:bound], x[bound:], y[bound:])
 
 """
 Cross-Validation
@@ -37,12 +36,54 @@ def cross_validation(model,x,y,k=5):
         vl_y = y[rows]
         nn = Network(**model)
         tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y)
-        return (vl_loss[epoch], epoch)
+        return (tr_loss,vl_loss,epoch)
 
+    """
+    Using K-hold cross validation the best
+    average number of epochs is found.
+    Also the empirical risk is computed
+    as the average on the risk per fold.
+    """
     folds = list(map(estimate,range(k)))
-    error = sum([loss for loss,epoch in folds])/k
-    epoch = round(sum([epoch for loss,epoch in folds])/k)
-    return (error, epoch)
+    # TODO: floor or ceil?
+    epoch = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
+
+    """
+    To plot the result of cross-validation
+    the 'average' over the losses is computed
+    Since the arrays from each fold have different
+    lengths it's not possibile to simply sum them
+    and then divide the result by k.
+    It should be noticed that the only interesting
+    propriety is the fact that, like the epoch is the
+    average of the epochs per fold, the validation risk
+    estimate should be the average over the estimates per
+    fold.
+
+    This value can be computed as
+    """
+    risk  = sum([vl[e] for tr,vl,e in folds])/k
+    """
+    Just for graphical representation motifs we propose
+    the construction of an array of size [1:epoch] used 
+    to construct a sound plot for the error.
+    This is done by averaging the vectors via their relative position:
+    """
+    vl_loss = np.array([sum([vl[int(e*j/epoch)] for tr,vl,e in folds])/k for j in range(epoch+1)])
+    """   
+    This array is also sound for the validation process
+    since it should hold:
+    >>> vl_loss[epoch] == risk
+
+    To avoid numerical issues this is forcefully constrained:
+    """
+    vl_loss[epoch] = risk
+    """
+    Same reasoning and construction is applied for
+    the error in the training set.
+    """
+    tr_loss = np.array([sum([tr[int(e*j/epoch)] for tr,vl,e in folds])/k for j in range(epoch+1)])
+    return (tr_loss,vl_loss,epoch)
 
 class Validation:
     def __init__(self,loss,workers=16,threads=False,verbose=True):
@@ -56,12 +97,14 @@ class Validation:
     """
     Model selection
     Given a data set and a dictionary of possibile
-    hyperparameters it return the best model
+    hyperparameters it return a triple:
+    - loss over the training set
+    - loss over the validation set
+    - the best model
     """
     def model_selection(self,hp,x,y,k):
         grid = Grid(hp)
         risk = np.Inf
-        best = None
 
         # Avoid order bias
         x, y = shuffle(x, y)
@@ -79,47 +122,48 @@ class Validation:
                 p = functools.partial(cross_validation,x=x,y=y)
             res = self.executor.map(p,grid)
 
-        for p, r in zip(grid,res):
+        for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
+            curr_risk = vl_loss[epoch]
             if self.verbose:
-                print(p,r,sep='\t')
+                print(p,epoch,curr_risk,sep='\t')
 
             """
             Each item in the list of results per
-            hyperparameter combination is a tuple
-            where the first element is the error
-            on the validation set, while the other
-            is the number of optimal epochs chose
-            via early stopping.
-            r[0]     validation error
-            r[1]     epoch
+            hyperparameter combination is a triple
+            (tr_loss,vl_loss,epoch)
             """
-            if r[0] < risk:
+            if curr_risk < risk:
                 """
                 Merge of the dictionary of hyperparameters
                 with the optimal epochs.
                 """
-                best = {**p, 'epochs': r[1] }
-                risk = r[0]
+                best_model = {**p, 'epochs': epoch }
+                best_tr    = tr_loss
+                best_vl    = vl_loss
+                risk = curr_risk
 
         """
+        The training and the validation curves of the model are returned.
         NOTE: after the selection of the "best model" the
         model selection could proceed with a finer coarse
         grid search over smaller interval and within selected
-        hyperparameters
+        hyperparameters.
         """
-        return best
+        return (best_tr,best_vl,best_model)
 
     """
     Given a model and a dataset a neural network
     is trained using the dataset.
-    The procedure returns the risk computed
-    on the test set.
+    The procedure returns a triple containing:
+    - loss over the training set
+    - loss over the test set
+    - risk estimated on the test set
     """
     def estimate_test(self,model,x,y,test_x,test_y):
         # Train on the chosen model
         nn = Network(**model)
-        nn.train(x,y)
-        return nn.error(test_x,test_y,self.loss)
+        tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,self.loss)
+        return (tr_loss,te_loss,te_loss[epoch])
 
     """
     Double Cross-validation given a dataset and a
@@ -135,10 +179,10 @@ class Validation:
             tr_y = np.delete(y,rows,0)
             vl_x = x[rows]
             vl_y = y[rows]
-            model = self.model_selection(hp,tr_x,tr_y,k2)
+            _, _, model = self.model_selection(hp,tr_x,tr_y,k2)
             nn = Network(**model)
             nn.train(tr_x,tr_y)
-            return nn.error(vl_x,vl_y,self.loss)
+            return nn.error(vl_x,vl_y,loss_dict[self.loss])
 
         risk = map(estimate,range(k1))
         return sum(risk)/k1

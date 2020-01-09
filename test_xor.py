@@ -19,8 +19,9 @@ elif activations[-1] == 'sigmoid':
 
 nn = Network([2, hidden_units, 1],  activations=activations, minibatch=batch_size,
              eta=eta, epochs=epochs)
-loss_y = nn.train(x, y)
-plt.plot(loss_y, color="red")
+
+tr_losses, _, _ = nn.train(x, y)
+plt.plot(tr_losses, color="red")
 plt.show()
 
 print('------')
