@@ -154,7 +154,7 @@ class Network:
                     # Stop training if the nn didn't improve on VL for patience consecutive epochs
                     training = False
             else:
-                if epoch == self.epochs:
+                if epoch >= self.epochs:
                     # Stop training when the prefixed number of epochs has been reached
                     training = False
 
