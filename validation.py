@@ -109,7 +109,7 @@ class Validation:
         # Train on the chosen model
         nn = Network(**model)
         tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,self.loss)
-        return (tr_loss,te_loss,te_loss[epoch])
+        return (nn,tr_loss,te_loss,te_loss[epoch])
 
     """
     Double Cross-validation given a dataset and a

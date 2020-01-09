@@ -59,7 +59,7 @@ print(model,model_tr,model_vl,end='\n\n')
 
 # Model assessment on the test set
 print('Model assesment')
-tr_loss, te_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
+_, tr_loss, te_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
 print('Chosen model:')
 print(model,risk)
 
