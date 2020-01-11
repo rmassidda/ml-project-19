@@ -11,8 +11,16 @@ class Network:
         Indicates the number of layers and units in the network.
         The i-th value in the list represents the number of units
         in the i-th layer of the network.
-    activation: str, optional, default: 'sigmoid'
-        The activation function used in the network.
+    activations: list, optional, default: None
+        A list that contains the activation functions used in the
+        network. The i-th activation function in the list will be
+        used in the (i+1)-st layer of the network (the input layer
+        is not considered). If set to a value, f_hidden and f_output
+        will be ignored.
+    f_hidden: str, optional, default: 'tanh'
+        Activation function used for each hidden layer.
+    f_output: str, optional, default: 'identity'
+        Activation function used in the output layer.
     eta: float, optional, default: 1e-2
         The learning rate used in weight updates.
     weight_decay: float, optional, default: 1e-4
@@ -21,10 +29,15 @@ class Network:
         Momentum parameter.
     minibatch: int, optional, default: 32
         The batch size used in the minibatch gradient descent algorithm.
-    epochs: int, optional, default: 1000
-        The number of epochs to be executed in the training of the network.
+    epochs: int, optional, default: None
+        If set to a value, training stops when this number of epochs is
+        reached.
+    tol: float, optional, default: None
+        If set to a value, training stops when loss on TR has not improved
+        by at least tol for patience consecutive epochs. 
     patience: int, optional, default: 20
-        Patience parameter used in early stopping.
+        Patience parameter used when tol is set to a value or when in
+        early stopping mode (epochs=None and tol=None).
 
     Attributes
     ------
@@ -46,19 +59,24 @@ class Network:
         for the biases in the i-th layer.
     """
 
-    def __init__(self, topology, activations=None, eta=1e-2,
-                 weight_decay=1e-4, momentum=0.9, minibatch=32,
-                 epochs=None, patience=20):
+    def __init__(self, topology, activations=None, f_hidden='tanh',
+                 f_output='identity', eta=1e-2, weight_decay=1e-4,
+                 momentum=0.9, minibatch=32, epochs=None, tol=None,
+                 patience=20, max_epochs=3000):
         self.topology = topology
-        self.n_layers = len(topology)
+        self.activations = activations
+        self.f_hidden = f_hidden
+        self.f_output = f_output
         self.eta = eta
         self.weight_decay = weight_decay
         self.momentum = momentum
         self.minibatch = minibatch
-        self.activations = activations
         self.epochs = epochs
+        self.tol = tol
         self.patience = patience
+        self.max_epochs = max_epochs
 
+        self.n_layers = len(topology)
         self.weights = None
         self.biases = None
         self.V_dw = None
@@ -87,10 +105,10 @@ class Network:
         for i in range(self.n_layers - 1):
             self.V_db.append(np.zeros(self.topology[i+1]))
 
-        # Default: tanh for hidden layers and identity for output layer (regression)
+        # If not already set, initialize activations 
         if self.activations is None:
-            self.activations = ['tanh'] * (self.n_layers - 1)
-            self.activations[-1] = 'identity'
+            self.activations = [self.f_hidden] * (self.n_layers - 1)
+            self.activations[-1] = self.f_output
 
     def predict(self, x):
         """Predicts outputs."""
@@ -106,12 +124,13 @@ class Network:
         tr_losses = []
         val_losses = []
 
-        early_stopping = True if self.epochs is None and \
-                         val_x is not None and val_y is not None else False
-        if early_stopping:
-            no_improvement = 0
-            best_val_loss = np.Inf
+        early_stopping = True if self.epochs is None and self.tol is None \
+                         and val_x is not None and val_y is not None else False
+        tol_stop = True if self.tol is not None and self.epochs is None else False
 
+        no_improvement = 0
+        best_tr_loss = np.Inf
+        best_val_loss = np.Inf
         epoch = 0
         training = True
 
@@ -120,26 +139,23 @@ class Network:
             epoch += 1
 
             if verbose:
-                print("Epoch: %d" % epoch)
-            # Shuffle dataset in each epoch to avoid order bias
-            # And execute a single epoch 
-            x, y = shuffle(x, y)
+                print('Epoch: %d' % epoch)
 
             # Training
             self.epoch_train(x, y)
 
-            # Loss on the training set
+            # Compute loss on the training set
             tr_loss = self.error(x, y, loss_dict[f_loss])
             tr_losses.append(tr_loss)
             if verbose:
-                print("\tTraining loss: %f" % tr_loss)
+                print('\tTraining loss: %f' % tr_loss)
 
-            # Loss on the validation set
+            # Compute loss on the validation set
             if val_x is not None and val_y is not None:
                 val_loss = self.error(val_x, val_y, loss_dict[f_loss])
                 val_losses.append(val_loss)
                 if verbose:
-                    print("\tValidation loss: %f" % val_loss)
+                    print('\tValidation loss: %f' % val_loss)
 
             # Check stop conditions
             if early_stopping:
@@ -148,15 +164,28 @@ class Network:
                 else:
                     best_val_loss = val_loss
                     best_epoch = epoch
-                    if no_improvement > 0:
-                        no_improvement = 0 
-                if no_improvement == self.patience:
-                    # Stop training if the nn didn't improve on VL for patience consecutive epochs
+                    no_improvement = 0
+                if no_improvement >= self.patience:
+                    # Stop training if VL loss did not improve for patience consecutive epochs
+                    training = False
+            elif tol_stop:
+                if tr_loss > (best_tr_loss - self.tol):
+                    no_improvement += 1
+                else:
+                    no_improvement = 0
+                if tr_loss < best_tr_loss:
+                    best_tr_loss = tr_loss
+                if no_improvement >= self.patience:
+                    # Stop training if TR loss did not improve by at least tol for patience
+                    # consecutive epochs.
                     training = False
             else:
                 if epoch >= self.epochs:
                     # Stop training when the prefixed number of epochs has been reached
                     training = False
+            # Stop training if a maximum number of epochs has been reached
+            if epoch >= self.max_epochs:
+                training = False
 
         if not early_stopping:
             best_epoch = epoch
@@ -164,6 +193,11 @@ class Network:
         return np.array(tr_losses), np.array(val_losses), best_epoch - 1
 
     def epoch_train(self, x, y):
+
+        # Shuffle dataset in each epoch to avoid order bias
+        # And execute a single epoch 
+        x, y = shuffle(x, y)
+
         # Iterate over batches
         for batch_idx in range(0, len(x), self.minibatch):
             x_batch = x[batch_idx:batch_idx + self.minibatch]

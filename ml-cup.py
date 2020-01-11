@@ -5,84 +5,100 @@ from utils import onehot
 from validation import Validation
 import numpy as np
 import sys
+import time
 
-# Command line arguments
-train_fp = sys.argv[1]
-test_fp  = sys.argv[2]
-par_deg  = int(sys.argv[3])
+if __name__ == '__main__':
 
-# Data parsing
-x       = np.genfromtxt(train_fp,delimiter=',',usecols=range(1,21))
-y       = np.genfromtxt(train_fp,delimiter=',',usecols=(21,22))
-rows    = sample(range(len(x)), k=int(len(x)/4))
-train_x = np.delete(x,rows,0)
-train_y = np.delete(y,rows,0)
-test_x  = x[rows]
-test_y  = y[rows]
+    # Command line arguments
+    if len(sys.argv) == 4:
+        train_fp = sys.argv[1]
+        test_fp  = sys.argv[2]
+        par_deg  = int(sys.argv[3])
+    else:
+        train_fp = 'data/ML-CUP19-TR.csv'
+        test_fp  = 'data/ML-CUP19-TS.csv'
+        par_deg  = 8
 
-print('Train set',len(train_x),len(train_x)/len(x),sep='\t')
-print('Test set',len(test_x),len(test_x)/len(x),sep='\t')
+    # Data parsing
+    x       = np.genfromtxt(train_fp,delimiter=',',usecols=range(1,21))
+    y       = np.genfromtxt(train_fp,delimiter=',',usecols=(21,22))
+    rows    = sample(range(len(x)), k=int(len(x)/4))
+    train_x = np.delete(x,rows,0)
+    train_y = np.delete(y,rows,0)
+    test_x  = x[rows]
+    test_y  = y[rows]
 
-# Blind test set
-blind = np.genfromtxt(test_fp,delimiter=',',usecols=range(1,21))
+    print('Train set',len(train_x),len(train_x)/len(x),sep='\t')
+    print('Test set',len(test_x),len(test_x)/len(x),sep='\t')
 
-# Hyperparameters
-common = {
-    'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
-    'momentum': [0.9,0.99],
-    'weight_decay': [1e-2,1e-4],
-    'eta': [1e-1,1e-2],
-    'minibatch': [16,32,64]
-    }
-early_stopping = [{**common, 'patience': [50] }]
-fixed_epoch    = [{**common, 'epochs': [500] }]
-lite = [{
-    'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
-}]
+    # Blind test set
+    blind = np.genfromtxt(test_fp,delimiter=',',usecols=range(1,21))
 
-hf = [early_stopping, fixed_epoch]
-#NOTE: uncomment for lite test
-# hf = [lite]
+    # Hyperparameters
+    common = {
+        'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
+        'momentum': [0.9,0.99],
+        'weight_decay': [1e-2,1e-4],
+        'eta': [1e-1,1e-2],
+        'minibatch': [16,32,64]
+        }
+    early_stopping = [{**common, 'patience': [50] }]
+    fixed_epoch    = [{**common, 'epochs': [500] }]
+    lite = [{
+        'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
+    }]
 
-# Validation
-val = Validation('MEE',workers=par_deg,verbose=True)
+    hf = [early_stopping, fixed_epoch]
+    #NOTE: uncomment for lite test
+    # hf = [lite]
 
-# Identify the best family of models via double cross-validation
-print('Start double CV')
-family_risk = np.Inf
-for h in hf:
-    double_cv = val.double_cross_validation(train_x,train_y,h,5,3)
-    if double_cv < family_risk:
-        family = h
-        family_risk = double_cv
-print('Chosen family:')
-print(family, family_risk,end='\n\n')
+    # Validation
+    val = Validation('MEE',workers=par_deg,verbose=True)
 
-# Select the best model via cross-validation
-print('Model selection')
-model_tr, model_vl, model = val.model_selection(family,train_x,train_y,5)
-print('Chosen model:')
-print(model,model_tr,model_vl,end='\n\n')
+    start = time.time()
 
-# Model assessment on the test set
-print('Model assesment')
-nn, tr_loss, te_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
-print('Chosen model:')
-print(model,risk)
+    # Identify the best family of models via double cross-validation
+    print('Start model assessment')
+    family_risk = np.Inf
+    for h in hf:
+        print('Start double CV')
+        double_cv = val.double_cross_validation(train_x,train_y,h,5,3)
+        if double_cv < family_risk:
+            family = h
+            family_risk = double_cv
+    print('Chosen family:')
+    print(family, family_risk,end='\n\n')
 
-# Plot of the estimation
-plt.title('Risk estimation')
-plt.plot(tr_loss, color="green", label='TR')
-plt.plot(te_loss, color="blue", label='TE')
-plt.legend()
-plt.savefig('risk_estimation.png')
+    # Select the best model via cross-validation
+    print('Model selection')
+    model_tr, model_vl, model = val.model_selection(family,train_x,train_y,5)
+    print('Chosen model:')
+    print(model,model_tr,model_vl,end='\n\n')
 
-# Results for the blind test
-with open('rottenmeier_ML-CUP19-TS.csv', 'w+') as fp:
-    print('# Emanuele  Cosenza	Riccardo Massidda',file=fp)
-    print('# rottenmeier',file=fp)
-    print('# ML-CUP19',file=fp)
-    print('# '+date.today().strftime("%d/%m/%Y"),file=fp)
-    for i in range(len(blind)):
-        out = nn.predict(blind[i])
-        print(i+1,out[0],out[1],sep=',',file=fp)
+    # Model assessment on the test set
+    print('Model assessment')
+    nn, tr_loss, ts_loss, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
+    print('Chosen model:')
+    print(model,risk)
+
+    # Plot of the estimation
+    plt.title('Risk estimation')
+    plt.plot(tr_loss, color="green", label='TR')
+    plt.plot(ts_loss, color="blue", label='TS', linewidth=2, linestyle=':')
+    plt.xlabel('Epoch')
+    plt.ylabel('MEE')
+    plt.legend()
+    plt.savefig('risk_estimation.png')
+
+    # Results for the blind test
+    with open('rottenmeier_ML-CUP19-TS.csv', 'w+') as fp:
+        print('# Emanuele  Cosenza	Riccardo Massidda',file=fp)
+        print('# rottenmeier',file=fp)
+        print('# ML-CUP19',file=fp)
+        print('# '+date.today().strftime("%d/%m/%Y"),file=fp)
+        for i in range(len(blind)):
+            out = nn.predict(blind[i])
+            print(i+1,out[0],out[1],sep=',',file=fp)
+
+    end = time.time()
+    print('Total time elapsed: %f' % (end-start))
