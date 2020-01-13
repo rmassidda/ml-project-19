@@ -22,7 +22,7 @@ def cross_validation(model,x,y,loss,k=5):
         vl_x = x[rows]
         vl_y = y[rows]
         nn = Network(**model)
-        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,[loss])
+        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,loss)
         return (tr_loss,vl_loss,epoch)
 
     """
@@ -32,8 +32,8 @@ def cross_validation(model,x,y,loss,k=5):
     as the average on the risk per fold.
     """
     folds = list(map(estimate,range(k)))
-    tr_loss = sum([tr_loss[epoch] for tr_loss,vl_loss,epoch in folds])/k
-    vl_loss = sum([vl_loss[epoch] for tr_loss,vl_loss,epoch in folds])/k
+    tr_loss = sum([tr_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
+    vl_loss = sum([vl_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
     # TODO: floor or ceil?
     epoch   = int(np.ceil(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
 
@@ -108,8 +108,8 @@ class Validation:
     def estimate_test(self,model,x,y,test_x,test_y):
         # Train on the chosen model
         nn = Network(**model)
-        tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,[self.loss])
-        return (nn,tr_loss,te_loss,te_loss[epoch])
+        tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,self.loss)
+        return (nn,tr_loss,te_loss,te_loss[0][epoch])
 
     """
     Double Cross-validation given a dataset and a

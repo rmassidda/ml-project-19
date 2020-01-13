@@ -56,15 +56,6 @@ To achieve a good generalization power it's fundamental to implement
 The L2 regularization is implemented to avoid the risk of overfitting the training data;
 also an early stopping mechanism to identify a good number of training epochs can have regularization effects as in
 
-Table \ref{hyperparameters_table} resumes all the possible hyperparameters and the range of admissible values.
-
-| Hyperparameter | Range |
-|------|----|
-| momentum  | $[0,1]$  |
-| weight_decay  | $[0,1]$  |
-
-Table: Hyperparameters available \label{hyperparameters_table}
-
 ## Validation
 
 The lack of a reliable external test set required the development of a strategy to assess the performances of the model by using an internal one.

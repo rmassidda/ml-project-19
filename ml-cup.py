@@ -44,33 +44,20 @@ if __name__ == '__main__':
         'f_hidden': ['tanh'],
         'f_output': ['identity']
         }
-    early_stopping = [{**common, 'patience': [50] }]
-    fixed_epoch = [{**common, 'epochs': [500] }]
-    lite = [{
+    early_stopping = {**common, 'patience': [50] }
+    fixed_epoch = {**common, 'epochs': [500] }
+    lite = {
         'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
-    }]
+    }
 
-    hf = [early_stopping, fixed_epoch]
+    family = [early_stopping, fixed_epoch]
     #NOTE: uncomment for lite test
-    # hf = [lite]
+    # family = [lite]
 
     # Validation
-    val = Validation('MEE',workers=par_deg,verbose=True)
+    val = Validation(['MEE'],workers=par_deg,verbose=True)
 
     start = time.time()
-
-    # Identify the best family of models via double cross-validation
-    print('Start model assessment')
-    family_risk = np.Inf
-    for h in hf:
-        print('Start double CV')
-        double_cv = val.double_cross_validation(train_x,train_y,h,5,3)
-        print('Estimated risk: ', double_cv)
-        if double_cv < family_risk:
-            family = h
-            family_risk = double_cv
-    print('Chosen family:')
-    print(family, family_risk,end='\n\n')
 
     # Select the best model via cross-validation
     print('Model selection')

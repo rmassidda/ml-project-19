@@ -28,7 +28,7 @@ if __name__ == '__main__':
     test_y = np.genfromtxt(test_fp,usecols=(0))
 
     # Hyperparameters
-    early_stopping = [{
+    early_stopping = {
         'f_hidden' : ['tanh'],
         'f_output' : ['sigmoid'],
         'minibatch': [1,16],
@@ -37,8 +37,8 @@ if __name__ == '__main__':
         'momentum': [0.9,0.99],
         'weight_decay': [1e-2,1e-4],
         'patience': [50]
-        }]
-    fixed_epoch = [{
+        }
+    fixed_epoch = {
         'f_hidden' : ['tanh'],
         'f_output' : ['sigmoid'],
         'minibatch': [1,16],
@@ -47,26 +47,20 @@ if __name__ == '__main__':
         'momentum': [0.9,0.99],
         'weight_decay': [1e-2,1e-4],
         'epochs': [500]
-        }]
+        }
 
-    hf = [early_stopping, fixed_epoch]
+    lite = {
+        'topology': [[17,2,1],[17,4,1],[17,8,1]],
+    }
+
+    family = [early_stopping, fixed_epoch]
+    #NOTE: uncomment for lite test
+    # family = [lite]
 
     # Validation
-    val = Validation('MCL',workers=par_deg,verbose=True)
+    val = Validation(['MCL','MSE'],workers=par_deg,verbose=True)
 
     start = time.time()
-
-    # Identify the best family of models via double cross-validation
-    print('Start model assessment')
-    family_risk = np.Inf
-    for h in hf:
-        print('Start double CV')
-        double_cv = val.double_cross_validation(train_x,train_y,h,5,3)
-        if double_cv < family_risk:
-            family = h
-            family_risk = double_cv
-    print('Chosen family:')
-    print(family, family_risk,end='\n\n')
 
     # Select the best model via cross-validation
     print('Model selection')
@@ -84,12 +78,23 @@ if __name__ == '__main__':
     print('Total time elapsed: %f' % (end-start))
 
     # Plot of the estimation
-    tr_accs = 100 * (1 - tr_err)
-    ts_accs = 100 * (1 - ts_err)
-    plt.title('Risk estimation')
+    tr_accs = 100 * (1 - tr_err[0])
+    ts_accs = 100 * (1 - ts_err[0])
+    plt.title('MCL Monks')
     plt.plot(tr_accs, color="green", label='TR')
     plt.plot(ts_accs, color="blue", label='TS', linewidth=2, linestyle=':')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy (%)')
     plt.legend()
-    plt.show()
+    plt.savefig('MCL_monks.png')
+    
+    plt.cla()
+    plt.clf()
+
+    plt.title('MSE Monks')
+    plt.plot(tr_err[1], color="green", label='TR')
+    plt.plot(ts_err[1], color="blue", label='TS', linewidth=2, linestyle=':')
+    plt.xlabel('Epoch')
+    plt.ylabel('MSE')
+    plt.legend()
+    plt.savefig('MSE_monks.png')
