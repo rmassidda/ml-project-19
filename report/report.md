@@ -19,42 +19,67 @@ bibliography: ml-2019.bib
   Type A project.
 \end{center}
 \begin{abstract}
-Multi-layer perceptron with different regulations techniques to avoid overfitting issues.
-The model selection and the assessment of the learning process are validated by using the cross-validation method.
+Design and implementation of a multi-layer perceptron with different regulations techniques to avoid overfitting issues.
+The model selection and the assessment of the learning process on the \texttt{ML-CUP19} dataset are validated by using the cross-validation method.
 \end{abstract}
 
 # Introduction
-The presence of different techniques to improve the performances of an artificial neural network, requires the use of formal methods to validate the effectiveness of the proposed improvements.
-Implementing from the ground up both the network and the validation techniques has lead to the execution of different experiments to motivate the choices made during the whole software life cycle.
+The presence of different techniques to improve the performances of an artificial neural network requires the use of formal methods to validate their effectiveness.
+Implementing from the ground up the network and the validation methods has lead to the execution of different experiments to motivate the design choices.
 
-The proposed neural network is a multilayer perceptron designed to be user-configurable as much as possible, without forcing any design choice in the code but instead allowing a big variety of combinations to be tested independently.
-The learning of the weights in the network is done by using the back-propagation algorithm[@rumelhart_parallel_1986], some variations have been introduced in the update rule to permit some enhancements.
+The proposed solution for the competition over the `ML-CUP19` dataset is a multilayer perceptron designed to be user-configurable as much as possible, allowing a big variety of combinations to be tested independently.
+The learning of the weights in the network is based on the back-propagation algorithm[@rumelhart_parallel_1986], variations have been introduced in the update rule to achieve regularization or to improve the overall performances.
 
-One of this variation, is given by the possibility of using the momentum technique[@goodfellow_deep_2016] to accelerate the learning process.
-Also the L2 regularization, known also as Tikhonov regularization, requires adding a penalty for undesirable weights in the update rule.
+The network also offers the possibility of early stopping[@prechelt_early_nodate], since it is a recognized good regularization technique, and furthermore it reduces the computational time by not learning for more epochs than required.
 
-The model also offers the possibility of early stopping[@prechelt_early_nodate], since it is a recognized good regularization technique, and furthermore it reduces the computational time by not learning for more epochs than required.
-
-To perform the model selection has been implemented a mechanism to automatically execute grid search over a family of possible models.
-Each relevant model generate by iterating on the grid can then be validated by using an hold-out approach or cross-validation depending on the requirements of the experiment.
-If the early stopping technique is used during training, the cross-validation approach also computes the mean of the stop epochs to approximate the optimal epochs number to train the final model.
-
+A mechanism that automatically executes a grid search over various hyperparameters combinations has been implemented to perform model selection, each relevant model generated can then be validated by cross-validation.
 The estimation of the risk, or model assessment, to evaluate the generalization power of the selected model can be computed by using a separate test set or by the double cross-validation algorithm.
-Also in this case depending on the nature of the experiment one of this approaches, or even both, have been chosen.
 
-To expect the achievement of generalization all of the experiments assume a certain degree of smoothness in the source producing the data, respecting so the inductive bias of neural networks 
+<!-- To expect the achievement of generalization all of the experiments assume a certain degree of smoothness in the source producing the data, respecting so the inductive bias of neural networks --> 
 
 # Method
-The numerical computational needs are addressed by NumPy[@oliphant_guide_2015].
-The topology of the network is represented using a list of layers.
-The $i$-th weight matrix represents the weights connecting the nodes of the layer $i$ to the nodes in the layer $i+1$, that is the outgoing edges for the layer $i$ and the ingoing edges for $i+1$.
+A functional neural network, and its relative validation mechanisms, requires a certain amount of numerical computational needs, addressed in the described implementation by NumPy[@oliphant_guide_2015].
 
-The prediction is coded by simply forwarding the input in the network.
-During the training phase the input is shuffled to avoid ordering bias[@unknown], after this the scan of the data is done in a minibatching fashion.
-Grid search is implemented as a  function capable to automatically perform the Cartesian product over the set of relevant values for each hyperparameter.
+## Network
+The class `Network` implements the neural network, by using it's constructor is possible to set all the required hyperparameters for the techniques that are subsequently described.
+The implementation also offers methods to learn from a set of examples via back-propagation and to predict sound outcomes for new patterns in forward mode.
+
+Weight initialization!
+
+The network uses by default the $tanh$ function for the hidden layers and the identity function for the output layer, we provide in `activation.py` other activation functions (ReLU and sigmoid) that can be possibly used by the artificial neurons.
+
+The back-propagation learning algorithm implemented analyzes the patterns by aggregating them using the minibatch technique.
+The update rule is variated to speedup the SGD computation by using momentum information the computation of SGD can speedup, achieving better results with a smaller number of epochs.
+
+To achieve a good generalization power it's fundamental to implement 
+
+The L2 regularization is implemented to avoid the risk of overfitting the training data;
+also an early stopping mechanism to identify a good number of training epochs can have regularization effects as in
+
+Table \ref{hyperparameters_table} resumes all the possible hyperparameters and the range of admissible values.
+
+| Hyperparameter | Range |
+|------|----|
+| momentum  | $[0,1]$  |
+| weight_decay  | $[0,1]$  |
+
+Table: Hyperparameters available \label{hyperparameters_table}
+
+## Validation
+
+The lack of a reliable external test set required the development of a strategy to assess the performances of the model by using an internal one.
+Since the explicit requirement for this report to plot the learning curve of the selected final model against both the training and the test set, a double cross-validation approach is not feasible, given that it produces only a scalar value representing the risk of the family of models.
+Given this constraint in the validation procedure, the dataset is partitioned in training and test set by random sampling without replacement in proportion $80/20\%$.
+
+The model selection follows a grid search approach, implemented in `grid.py` as a function capable to perform the Cartesian product over the set of relevant values for each hyperparameter, returning an iterable over all the sound combinations.
+The grid search is internally used by the cross-validation algorithm implemented in `validation.py`, the implementation shuffles the data and uses by default $k=5$ fold over the training set and returns the best hyperparameter selection.
+Given the choice of hyperparameters a new model is trained again by using the whole dataset, except obviously the internal test set.
+
+By using the internal test partition extracted by the dataset it's now possible to perform model assessment and obtain the loss information needed to plot the learning curve of the model.
+
+The mechanism hereby described is used by the script `ml-cup.py` to automatically perform model selection and assessment, other then producing the plots and the result for the blind competition.
 
 # Experiments
-The implementation of the network has been tested against the MONKS datasets, showing how a good balance between the hyper-parameters must be found using formal validation techniques.
 
 ## Monk's Results
 
