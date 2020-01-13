@@ -13,10 +13,10 @@ It the returns the empirical risk.
 """
 def cross_validation(model,x,y,loss,k=5):
     x, y = shuffle(x, y)
-    batch = np.int64(np.floor(len(x)/k))
+    batch = np.int64(np.ceil(len(x)/k))
 
     def estimate(i):
-        rows = range(i*batch,(i+1)*batch)
+        rows = range(i*batch,min((i+1)*batch,len(x)-1))
         tr_x = np.delete(x,rows,0)
         tr_y = np.delete(y,rows,0)
         vl_x = x[rows]
