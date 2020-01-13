@@ -38,6 +38,8 @@ class Network:
     patience: int, optional, default: 20
         Patience parameter used when tol is set to a value or when in
         early stopping mode (epochs=None and tol=None).
+    max_norm: float, optional, default: 1
+        Norm clipping to avoid gradient explosion
 
     Attributes
     ------
@@ -62,7 +64,7 @@ class Network:
     def __init__(self, topology, activations=None, f_hidden='tanh',
                  f_output='identity', eta=1e-2, weight_decay=1e-4,
                  momentum=0.9, minibatch=32, epochs=None, tol=None,
-                 patience=20, max_epochs=3000):
+                 patience=20, max_epochs=3000, max_norm=1):
         self.topology = topology
         self.activations = activations
         self.f_hidden = f_hidden
@@ -75,6 +77,7 @@ class Network:
         self.tol = tol
         self.patience = patience
         self.max_epochs = max_epochs
+        self.max_norm = max_norm
 
         self.n_layers = len(topology)
         self.weights = None
@@ -253,6 +256,12 @@ class Network:
             delta = np.dot(self.weights[-l+1].T, delta) * f(nets[-l], True)
             grad_b[-l] = delta
             grad_w[-l] = np.outer(delta, activations[-l-1])
+
+            # Bound the gradient norm (Mikholov et al)
+            grad_w[-l] = [ row if np.linalg.norm(row) < self.max_norm else row/np.linalg.norm(row)
+                    for row in grad_w[-l] ]
+            grad_b[-l] = [ row if np.linalg.norm(row) < self.max_norm else row/np.linalg.norm(row)
+                    for row in grad_b[-l] ]
         return grad_b, grad_w
 
     def step(self, grad_b, grad_w, batch_size):
@@ -262,7 +271,7 @@ class Network:
                      for v_dw, gw in zip(self.V_dw, grad_w)]
         self.V_db = [self.momentum * v_db + (1 - self.momentum) * gb
                      for v_db, gb in zip(self.V_db, grad_b)]
-        
+
         # Update weights and biases using momentum and L2 regularization
         self.weights = [w + (self.eta / batch_size) * v_dw - self.weight_decay * w
                         for w, v_dw in zip(self.weights, self.V_dw)]
