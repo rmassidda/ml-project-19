@@ -22,7 +22,7 @@ def cross_validation(model,x,y,loss,k=5):
         vl_x = x[rows]
         vl_y = y[rows]
         nn = Network(**model)
-        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,loss)
+        tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,[loss])
         return (tr_loss,vl_loss,epoch)
 
     """
@@ -108,7 +108,7 @@ class Validation:
     def estimate_test(self,model,x,y,test_x,test_y):
         # Train on the chosen model
         nn = Network(**model)
-        tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,self.loss)
+        tr_loss, te_loss, epoch = nn.train(x,y,test_x,test_y,[self.loss])
         return (nn,tr_loss,te_loss,te_loss[epoch])
 
     """

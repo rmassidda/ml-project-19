@@ -40,10 +40,12 @@ if __name__ == '__main__':
         'momentum': [0.9,0.99],
         'weight_decay': [1e-2,1e-4],
         'eta': [1e-1,1e-2],
-        'minibatch': [16,32,64]
+        'minibatch': [16,32,64],
+        'f_hidden': ['tanh'],
+        'f_output': ['identity']
         }
     early_stopping = [{**common, 'patience': [50] }]
-    fixed_epoch    = [{**common, 'epochs': [500] }]
+    fixed_epoch = [{**common, 'epochs': [500] }]
     lite = [{
         'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
     }]
@@ -63,6 +65,7 @@ if __name__ == '__main__':
     for h in hf:
         print('Start double CV')
         double_cv = val.double_cross_validation(train_x,train_y,h,5,3)
+        print('Estimated risk: ', double_cv)
         if double_cv < family_risk:
             family = h
             family_risk = double_cv
