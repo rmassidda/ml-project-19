@@ -45,18 +45,17 @@ if __name__ == '__main__':
         'f_output': ['identity']
         }
     early_stopping = {**common, 'patience': [50] }
-    fixed_epoch = {**common, 'epochs': [500] }
+    gradient_stop  = {**common, 'tol': [10] }
     lite = {
         'topology': [[20,30,2],[20,15,2],[20,15,10,2]],
     }
 
-    family = [early_stopping, fixed_epoch]
+    family = [early_stopping, gradient_stop]
     #NOTE: uncomment for lite test
     # family = [lite]
 
     # Validation
     val = Validation(['MEE'],workers=par_deg,verbose=True)
-
     start = time.time()
 
     # Select the best model via cross-validation
@@ -73,8 +72,8 @@ if __name__ == '__main__':
 
     # Plot of the estimation
     plt.title('Risk estimation')
-    plt.plot(tr_loss, color="green", label='TR')
-    plt.plot(ts_loss, color="blue", label='TS', linewidth=2, linestyle=':')
+    plt.plot(tr_loss[0], color="green", label='TR')
+    plt.plot(ts_loss[0], color="blue", label='TS', linewidth=2, linestyle=':')
     plt.xlabel('Epoch')
     plt.ylabel('MEE')
     plt.legend()

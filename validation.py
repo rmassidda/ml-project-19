@@ -65,8 +65,9 @@ class Validation:
 
         model_vl = np.Inf
         for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
-            # TODO: if eps is set don't add the 'learned' epochs to the model
-            p = {**p, 'epochs': epoch }
+            # if tol is set don't add the 'learned' epochs to the model
+            if 'tol' not in p:
+                p = {**p, 'epochs': epoch }
 
             """
             Each item in the list of results per
