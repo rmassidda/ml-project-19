@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # Data parsing
     x       = np.genfromtxt(train_fp,delimiter=',',usecols=range(1,21))
     y       = np.genfromtxt(train_fp,delimiter=',',usecols=(21,22))
-    rows    = sample(range(len(x)), k=int(len(x)/4))
+    rows    = sample(range(len(x)), k=int(len(x)/5))
     train_x = np.delete(x,rows,0)
     train_y = np.delete(y,rows,0)
     test_x  = x[rows]

@@ -51,15 +51,15 @@ The combination of some hyperparameters could lead to numerical errors due to a 
 This problem is dealt by normalizing the gradient if it surpassess a certain threshold.
 
 The back-propagation learning algorithm implemented analyzes the patterns by aggregating them using the minibatch technique, to speedup the computation the update rule also considers momentum information, achieving better results with a smaller number of epochs.
-The L2 regularization is implemented to avoid the overfitting of the training data and 
+L2 regularization also is implemented to avoid the overfitting of the training data.
 
 The learning process can be terminated in three different ways:
 
-- A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than that constant value.
+- A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than the provided value.
 - An early stopping mechanism is implemented by checking if the loss on a given validation set does not improve after a fixed number of epochs.
-This solution also leads to an implicit regularization of the model, by avoiding overfitting of the dataset[@prechelt_early_nodate].
+This solution also leads to an implicit regularization of the model, avoiding overfitting of the dataset[@prechelt_early_nodate].
 - Similar to early stopping if the loss on the training set doesn't improve over a fixed number of epochs the learning process is stopped.
-This is equivalent to checking if the norm of the gradient in the SGD algorithm is stuck under a certain threshold.
+This is equivalent to assert that the norm of the gradient in the SGD algorithm is stuck under a certain threshold.
 
 ## Validation
 
@@ -68,7 +68,9 @@ Since the explicit requirement for this report to plot the learning curve of the
 Given this constraint in the validation procedure, the dataset is partitioned in training and test set by random sampling without replacement in proportion $80/20\%$.
 
 The model selection follows a grid search approach, implemented in `grid.py` as a function capable to perform the Cartesian product over the set of relevant values for each hyperparameter, returning an iterable over all the sound combinations.
-The grid search is internally used by the cross-validation algorithm implemented in `validation.py`, the implementation shuffles the data and uses by default $k=5$ fold over the training set and returns the best hyperparameter selection.
+
+The grid search is used for the model selection, executing the cross-validation algorithm implemented in `validation.py` for each possible combination.
+The implementation shuffles the data, uses by default $k=5$ fold over the training set and returns the best hyperparameter selection.
 Given the choice of hyperparameters a new model is trained again by using the whole dataset, except obviously the internal test set.
 
 By using the internal test partition extracted by the dataset it's now possible to perform model assessment and obtain the loss information needed to plot the learning curve of the model.
