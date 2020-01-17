@@ -124,8 +124,8 @@ class Network:
     def train(self, x, y, val_x=None, val_y=None, losses=['MSE'], verbose=False):
         """Trains a neural network on a dataset."""
         self.initialize()
-        tr_losses = [[] for i in range(len(losses))]
-        val_losses = [[] for i in range(len(losses))]
+        tr_losses = np.empty((len(losses),self.max_epochs))
+        vl_losses = np.empty((len(losses),self.max_epochs))
 
         early_stopping = True if self.epochs is None and self.tol is None \
                          and val_x is not None and val_y is not None else False
@@ -133,14 +133,11 @@ class Network:
 
         no_improvement = 0
         best_tr_loss = np.Inf
-        best_val_loss = np.Inf
+        best_vl_loss = np.Inf
         epoch = 0
         training = True
 
         while training:
-
-            epoch += 1
-
             if verbose:
                 print('Epoch: %d' % epoch)
 
@@ -149,33 +146,31 @@ class Network:
 
             # Compute losses on the training set
             for i, loss in enumerate(losses):
-                tr_loss = self.error(x, y, loss_dict[loss])
-                tr_losses[i].append(tr_loss)
+                tr_losses[i][epoch] = self.error(x, y, loss_dict[loss])
                 if verbose:
-                    print('\tTraining loss (%s): %f' % (loss, tr_loss))
+                    print('\tTraining loss (%s): %f' % (loss, tr_losses[i][epoch]))
 
             # Compute losses on the validation set
             if val_x is not None and val_y is not None:
                 for i, loss in enumerate(losses):
-                    val_loss = self.error(val_x, val_y, loss_dict[loss])
-                    val_losses[i].append(val_loss)
+                    vl_losses[i][epoch] = self.error(val_x, val_y, loss_dict[loss])
                     if verbose:
-                        print('\tValidation loss (%s): %f' % (loss, val_loss))
+                        print('\tValidation loss (%s): %f' % (loss, vl_losses[i][epoch]))
 
             # Check stop conditions
             if early_stopping:
-                val_loss = val_losses[0][epoch-1]
-                if val_loss >= best_val_loss:
+                vl_loss = vl_losses[0][epoch]
+                if vl_loss >= best_vl_loss:
                     no_improvement += 1
                 else:
-                    best_val_loss = val_loss
+                    best_vl_loss = vl_loss
                     best_epoch = epoch
                     no_improvement = 0
                 if no_improvement >= self.patience:
                     # Stop training if VL loss did not improve for patience consecutive epochs
                     training = False
             elif tol_stop:
-                tr_loss = tr_losses[0][epoch-1]
+                tr_loss = tr_losses[0][epoch]
                 if tr_loss > (best_tr_loss - self.tol):
                     no_improvement += 1
                 else:
@@ -194,10 +189,12 @@ class Network:
             if epoch >= self.max_epochs:
                 training = False
 
-        if not early_stopping:
-            best_epoch = epoch
+            epoch += 1
 
-        return np.array(tr_losses), np.array(val_losses), best_epoch - 1
+        if not early_stopping:
+            best_epoch = epoch - 1
+
+        return tr_losses[:,:best_epoch+1], vl_losses[:,:best_epoch+1], best_epoch
 
     def epoch_train(self, x, y):
 
