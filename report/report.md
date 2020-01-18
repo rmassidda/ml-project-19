@@ -79,7 +79,29 @@ The mechanism hereby described is used by the script `ml-cup.py` to automaticall
 
 # Experiments
 
-## Monk's Results
+## MONK's dataset
+
+The results illustrated in table \ref{monks_results} and \ref{monks_plots} are obtained by averaging eight independent runs for each task.
+The hidden layer contains 4 hidden units using $tanh$ as activation function, while the output layer uses the sigmoid function.
+The network has been trained for 2000 epochs by using a minibatch of 32 examples, no further technique are used otherwise explicitly noted in the tables.
+
+Table: (Experimental results over the MONK's datasets) \label{monks_results}
+
+| Task | Model | MSE (TR/TS) | Accuracy (TR/TS) (%) |
+|------|-------|-------------|----------------------|
+| monks-1     | $\eta = 0.5$ | 0.0005/0.0019 | 100.0%/99.91% | 
+| monks-2     | $\eta = 0.5$ | 0.0003/0.0007 | 100.0%/100.0% | 
+| monks-3     | $\eta = 0.5$ | 0.0091/0.0416 | 99.18%/94.50% | 
+| monks-3-reg | $\eta = 0.5, \lambda = 0.01$ | 0.1160/0.1075 | 93.44%/97.22% | 
+
+Table: (Plot of MSE and accuracy for the MONK’s benchmark) \label{monks_plots}
+
+| MSE (TR/TS) | Accuracy (TR/TS) (%) |
+|-------------|----------------------|
+| ![monks-1_MCL](../results/monks_8_run/monks-1_MCL.png){ width=230px } | ![monks-1_MSE](../results/monks_8_run/monks-1_MSE.png){ width=230px } |
+| ![monks-2_MCL](../results/monks_8_run/monks-2_MCL.png){ width=230px } | ![monks-2_MSE](../results/monks_8_run/monks-2_MSE.png){ width=230px } |
+| ![monks-3_MCL](../results/monks_8_run/monks-3_MCL.png){ width=230px } | ![monks-3_MSE](../results/monks_8_run/monks-3_MSE.png){ width=230px } |
+| ![monks-3_reg_MCL](../results/monks_8_run/monks-3_reg_MCL.png){ width=230px } | ![monks-3_reg_MSE](../results/monks_8_run/monks-3_reg_MSE.png){ width=230px } |
 
 ## Cup Results
 

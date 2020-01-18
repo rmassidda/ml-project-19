@@ -3,7 +3,6 @@ Using 8 parallel workers
 monks-1 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'topology': [17, 4, 1], 'epochs': 2000}
 Accuracy: 100.0 99.91319444444444
 MSE: 0.0005048318796001055 0.0018630198605090026
-Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome. Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.
 monks-2 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'topology': [17, 4, 1], 'epochs': 2000}
 Accuracy: 100.0 100.0
 MSE: 0.0003224473902095423 0.0006646346614593285
