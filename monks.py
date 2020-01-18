@@ -33,15 +33,16 @@ if __name__ == '__main__':
         'eta': 0.5,
         'momentum': 0,
         'weight_decay': 0,
+        'topology': [17,4,1],
         'epochs': epoch,
     }
 
     monk_ranges = [3,3,2,3,4,2]
 
     model = [
-            { **common, 'topology': [17,3,1] },
-            { **common, 'topology': [17,4,1] },
-            { **common, 'topology': [17,4,1] },
+            { **common},
+            { **common},
+            { **common},
             { **common, 'topology': [17,4,1], 'weight_decay': 1e-2 }
             ]
 
