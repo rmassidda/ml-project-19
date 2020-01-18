@@ -1,100 +1,135 @@
+from concurrent.futures import ProcessPoolExecutor
 from matplotlib import pyplot as plt
+from network import Network
 from utils import onehot
-from validation import Validation
+import functools
 import numpy as np
 import sys
-import time
 
+def worker(seed,m,x,y,tx,ty,l):
+    # Set seed for the current process
+    np.random.seed(seed)
+    nn = Network(**m)
+    return nn.train(x,y,tx,ty,l)
+
+"""
+Given a number of experiments, compute the average of the
+results and output the relative plots.
+"""
 if __name__ == '__main__':
 
-    # Command line arguments
     if len(sys.argv) == 4:
-        train_fp = sys.argv[1]
-        test_fp  = sys.argv[2]
-        par_deg  = int(sys.argv[3])
+        n_trials = int(sys.argv[1])
+        max_w    = int(sys.argv[2])
+        epoch    = int(sys.argv[3])
     else:
-        train_fp = 'data/monks/monks-1.train'
-        test_fp  = 'data/monks/monks-1.test'
-        par_deg  = 8
+        print('Usage:',sys.argv[0],'n_trials max_w epoch',file=sys.stderr)
+        sys.exit(1)
+
+    common = {
+        'f_hidden': 'tanh',
+        'f_output': 'sigmoid',
+        'minibatch': 32,
+        'eta': 0.5,
+        'momentum': 0,
+        'weight_decay': 0,
+        'epochs': epoch,
+    }
 
     monk_ranges = [3,3,2,3,4,2]
 
-    # Data load
-    raw_x = np.genfromtxt(train_fp,usecols=(1,2,3,4,5,6))
-    train_x = np.array(list(map(lambda x: onehot(x,monk_ranges),raw_x)))
-    train_y = np.genfromtxt(train_fp,usecols=(0))
-    raw_x = np.genfromtxt(test_fp,usecols=(1,2,3,4,5,6))
-    test_x = np.array(list(map(lambda x: onehot(x,monk_ranges),raw_x)))
-    test_y = np.genfromtxt(test_fp,usecols=(0))
+    model = [
+            { **common, 'topology': [17,3,1] },
+            { **common, 'topology': [17,4,1] },
+            { **common, 'topology': [17,4,1] },
+            { **common, 'topology': [17,4,1], 'weight_decay': 1e-2 }
+            ]
 
-    # Hyperparameters
-    early_stopping = {
-        'f_hidden' : ['tanh'],
-        'f_output' : ['sigmoid'],
-        'minibatch': [1,16],
-        'eta': [1e-1,1e-2],
-        'topology': [[17,2,1],[17,4,1],[17,8,1]],
-        'momentum': [0.9,0.99],
-        'weight_decay': [1e-2,1e-4],
-        'patience': [50]
-        }
-    fixed_epoch = {
-        'f_hidden' : ['tanh'],
-        'f_output' : ['sigmoid'],
-        'minibatch': [1,16],
-        'eta': [1e-1,1e-2],
-        'topology': [[17,2,1],[17,4,1],[17,8,1]],
-        'momentum': [0.9,0.99],
-        'weight_decay': [1e-2,1e-4],
-        'epochs': [500]
-        }
+    dataset  = ['monks-1','monks-2','monks-3','monks-3']
+    name     = ['monks-1','monks-2','monks-3','monks-3_reg']
+    losses   = ['MCL', 'MSE']
 
-    lite = {
-        'topology': [[17,2,1],[17,4,1],[17,8,1]],
-    }
+    print('Running',n_trials,'trials for',epoch,'epochs')
+    print('Using',max_w,'parallel workers')
 
-    family = [early_stopping, fixed_epoch]
-    #NOTE: uncomment for lite test
-    # family = [lite]
+    for i in range(len(dataset)):
+        # Read from file
+        train_fp = 'data/monks/'+dataset[i]+'.train'
+        test_fp  = 'data/monks/'+dataset[i]+'.test'
 
-    # Validation
-    val = Validation(['MCL','MSE'],workers=par_deg,verbose=True)
+        # Training set
+        raw_x = np.genfromtxt(train_fp,usecols=(1,2,3,4,5,6))
+        train_x = np.array(list(map(lambda x: onehot(x,monk_ranges),raw_x)))
+        train_y = np.genfromtxt(train_fp,usecols=(0))
 
-    start = time.time()
+        # Test set
+        raw_x = np.genfromtxt(test_fp,usecols=(1,2,3,4,5,6))
+        test_x = np.array(list(map(lambda x: onehot(x,monk_ranges),raw_x)))
+        test_y = np.genfromtxt(test_fp,usecols=(0))
 
-    # Select the best model via cross-validation
-    print('Model selection')
-    model_tr, model_vl, model = val.model_selection(family,train_x,train_y,5)
-    print('Chosen model:')
-    print(model,model_tr,model_vl,end='\n\n')
+        # Average results
+        avg_acc_tr = np.zeros(epoch+1)
+        avg_acc_ts = np.zeros(epoch+1)
+        avg_mse_tr = np.zeros(epoch+1)
+        avg_mse_ts = np.zeros(epoch+1)
 
-    # Model assessment on the test set
-    print('Model assessment')
-    _, tr_err, ts_err, risk  = val.estimate_test(model,train_x,train_y,test_x,test_y)
-    print('Chosen model:')
-    print(model,risk)
+        # Map phase
+        if max_w == 0:
+            # Sequential experiments
+            res = []
+            for j in range(n_trials):
+                res.append(worker(j,model[j],train_x,train_y,test_x,test_y,losses))
+        else:
+            # Parallel experiments
+            w = functools.partial(worker,
+                    m=model[i],
+                    x=train_x,
+                    y=train_y,
+                    tx=test_x,
+                    ty=test_y,
+                    l=losses)
 
-    end = time.time()
-    print('Total time elapsed: %f' % (end-start))
+            executor = ProcessPoolExecutor(max_workers=max_w)
+            seeds = np.random.randint(2**32, size=n_trials)
+            res = executor.map(w,seeds)
 
-    # Plot of the estimation
-    tr_accs = 100 * (1 - tr_err[0])
-    ts_accs = 100 * (1 - ts_err[0])
-    plt.title('MCL Monks')
-    plt.plot(tr_accs, color="green", label='TR')
-    plt.plot(ts_accs, color="blue", label='TS', linewidth=2, linestyle=':')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy (%)')
-    plt.legend()
-    plt.savefig('MCL_monks.png')
-    
-    plt.cla()
-    plt.clf()
+        # Reduce results
+        for (tr_err,ts_err,e) in res:
+            # Update accuracy
+            avg_acc_tr += (100 * (1 - tr_err[0]))
+            avg_acc_ts += (100 * (1 - ts_err[0]))
 
-    plt.title('MSE Monks')
-    plt.plot(tr_err[1], color="green", label='TR')
-    plt.plot(ts_err[1], color="blue", label='TS', linewidth=2, linestyle=':')
-    plt.xlabel('Epoch')
-    plt.ylabel('MSE')
-    plt.legend()
-    plt.savefig('MSE_monks.png')
+            # Update MSE
+            avg_mse_tr += tr_err[1]
+            avg_mse_ts += ts_err[1]
+
+        avg_acc_tr /= n_trials 
+        avg_acc_ts /= n_trials
+        avg_mse_tr /= n_trials
+        avg_mse_ts /= n_trials
+
+        # Print results
+        print(name[i],model[i])
+        print('Accuracy:',avg_acc_tr[epoch],avg_acc_ts[epoch])
+        print('MSE:',avg_mse_tr[epoch],avg_mse_ts[epoch])
+
+        # Plot of the estimation
+        plt.title('MCL Monks')
+        plt.plot(avg_acc_tr, color="green", label='TR')
+        plt.plot(avg_acc_ts, color="blue", label='TS', linewidth=2, linestyle=':')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy (%)')
+        plt.legend()
+        plt.savefig(name[i]+'_MCL.png')
+        plt.cla()
+        plt.clf()
+
+        plt.title('MSE Monks')
+        plt.plot(avg_mse_tr, color="green", label='TR')
+        plt.plot(avg_mse_ts, color="blue", label='TS', linewidth=2, linestyle=':')
+        plt.xlabel('Epoch')
+        plt.ylabel('MSE')
+        plt.legend()
+        plt.savefig(name[i]+'_MSE.png')
+        plt.cla()
+        plt.clf()

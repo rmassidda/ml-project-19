@@ -1,0 +1,12 @@
+monks-1 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 500, 'topology': [17, 3, 1]}
+Accuracy: 100.0 100.0
+MSE: 0.00853396200530924 0.012120871679921853
+monks-2 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 500, 'topology': [17, 2, 1]}
+Accuracy: 100.0 100.0
+MSE: 0.0022704450691855694 0.00259136755352433
+monks-3 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 500, 'topology': [17, 4, 1]}
+Accuracy: 96.72131147540983 93.5185185185185
+MSE: 0.03687662724627768 0.05148884411061128
+monks-3_reg {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0.01, 'epochs': 500, 'topology': [17, 4, 1]}
+Accuracy: 93.44262295081968 97.2222222222222
+MSE: 0.11685012751887904 0.10899709642172752

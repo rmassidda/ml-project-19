@@ -1,0 +1,15 @@
+Running 16 trials for 2000 epochs
+Using 8 parallel workers
+monks-1 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 2000, 'topology': [17, 3, 1]}
+Accuracy: 98.94153225806451 98.4375
+MSE: 0.010767310757358928 0.01539294886089196
+Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome. Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.
+monks-2 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 2000, 'topology': [17, 4, 1]}
+Accuracy: 100.0 99.29108796296296
+MSE: 0.00038259508503302197 0.006962661421699188
+monks-3 {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0, 'epochs': 2000, 'topology': [17, 4, 1]}
+Accuracy: 98.61680327868852 93.9380787037037
+MSE: 0.015385773066693463 0.0491786105801381
+monks-3_reg {'f_hidden': 'tanh', 'f_output': 'sigmoid', 'minibatch': 32, 'eta': 0.5, 'momentum': 0, 'weight_decay': 0.01, 'epochs': 2000, 'topology': [17, 4, 1]}
+Accuracy: 93.44262295081968 97.22222222222219
+MSE: 0.11607261462204903 0.10781147647846244
