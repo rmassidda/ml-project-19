@@ -39,7 +39,7 @@ class Network:
         Patience parameter used when tol is set to a value or when in
         early stopping mode (epochs=None and tol=None).
     max_norm: float, optional, default: 1
-        Norm clipping to avoid gradient explosion
+        Norm scaling to avoid gradient explosion
 
     Attributes
     ------
@@ -254,11 +254,11 @@ class Network:
             grad_b[-l] = delta
             grad_w[-l] = np.outer(delta, activations[-l-1])
 
-            # Bound the gradient norm (Mikholov et al)
-            grad_w[-l] = [ row if np.linalg.norm(row) < self.max_norm else row/np.linalg.norm(row)
-                    for row in grad_w[-l] ]
-            grad_b[-l] = [ row if np.linalg.norm(row) < self.max_norm else row/np.linalg.norm(row)
-                    for row in grad_b[-l] ]
+            # Bound the gradient norm (Pascanu et al)
+            norm = np.linalg.norm(grad_w[-l], axis=1)
+            norm = np.where( norm < self.max_norm, 1, norm )
+            grad_w[-l] = grad_w[-l] / norm[:,None]
+
         return grad_b, grad_w
 
     def step(self, grad_b, grad_w, batch_size):
