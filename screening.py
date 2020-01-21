@@ -66,7 +66,10 @@ if __name__ == '__main__':
     # Define experiments
     experiments = []
     experiments.append(Experiment('Fixed learning rate', [{**init, 'eta': [1,5e-1,1e-1,5e-2,1e-2,1e-3,1e-4,1e-5], 'epochs': [epoch]}]))
-    experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [0.1], 'eta': [1e-3,5e-2], 'tau': [100,200], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [5e-1], 'eta': [5e-3], 'tau': [100,200], 'epochs': [epoch]},
+        {**init, 'eta_zero': [1e-1], 'eta': [1e-3], 'tau': [100,200], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Oscillating decay learning rate', [{**init, 'eta_zero': [5], 'eta': [5e-2], 'tau': [100,200], 'epochs': [epoch]},
+        {**init, 'eta_zero': [1], 'eta': [1e-2], 'tau': [100,200], 'epochs': [epoch]}]))
     experiments.append(Experiment('Minibatch-bigstep', [{**init, 'eta': [1,0.5], 'minibatch': [1,4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Tikhonov regularization (L2)', [{**init, 'weight_decay': [0,1e-1,1e-2,1e-3,1e-4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Momentum', [{**init, 'momentum': [0,0.5,0.9,0.99,0.999], 'epochs': [epoch]}]))
