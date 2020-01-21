@@ -65,8 +65,12 @@ class Validation:
 
         model_vl = np.Inf
         for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
-            # if tol is set don't add the 'learned' epochs to the model
-            if 'tol' not in p:
+            """
+            The leaned epochs should be added only if
+            the training used early stopping on the
+            validation set.
+            """
+            if 'epochs' not in p and 'prefer_tr' in p and not p['prefer_tr']:
                 p = {**p, 'epochs': epoch }
 
             """
