@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # Define experiments
     experiments = []
     experiments.append(Experiment('Fixed learning rate', [{**init, 'eta': [1,5e-1,1e-1,5e-2,1e-2,1e-3,1e-4,1e-5], 'epochs': [epoch]}]))
-    experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [1,2], 'eta': [5e-1, 5e-2, 5e-3], 'tau': [200,500,1000], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [0.1], 'eta': [1e-3,5e-2], 'tau': [100,200], 'epochs': [epoch]}]))
     experiments.append(Experiment('Minibatch-bigstep', [{**init, 'eta': [1,0.5], 'minibatch': [1,4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Tikhonov regularization (L2)', [{**init, 'weight_decay': [0,1e-1,1e-2,1e-3,1e-4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Momentum', [{**init, 'momentum': [0,0.5,0.9,0.99,0.999], 'epochs': [epoch]}]))
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         plt.xlabel('Epoch')
         plt.ylabel('MSE')
         plt.legend()
-        plt.savefig('experiment_'+str(counter)+'.png')
+        plt.savefig('experiment_'+str(counter)+'.png', dpi=300)
 
         # Get ready for next experiment
         counter += 1
