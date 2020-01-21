@@ -109,7 +109,7 @@ if __name__ == '__main__':
         plt.xlabel('Epoch')
         plt.ylabel('MSE')
         plt.legend()
-        plt.savefig('experiment_'+str(counter)+'.png', dpi=300)
+        plt.savefig('screening_'+str(counter)+'.png', dpi=300)
 
         # Get ready for next experiment
         counter += 1
