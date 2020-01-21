@@ -1,0 +1,49 @@
+Train set	529	0.29971671388101984
+Run of 7 experiments
+
+"Fixed learning rate" consists of 8 models
+0 {'epochs': 200, 'eta': 1, 'topology': [20, 15, 2]} 6.331531522139996
+1 {'epochs': 200, 'eta': 0.5, 'topology': [20, 15, 2]} 3.146213079578833
+2 {'epochs': 200, 'eta': 0.1, 'topology': [20, 15, 2]} 2.3582579182933348
+3 {'epochs': 200, 'eta': 0.05, 'topology': [20, 15, 2]} 2.3298521085506922
+4 {'epochs': 200, 'eta': 0.01, 'topology': [20, 15, 2]} 3.299121116917965
+5 {'epochs': 200, 'eta': 0.001, 'topology': [20, 15, 2]} 5.665895012959169
+6 {'epochs': 200, 'eta': 0.0001, 'topology': [20, 15, 2]} 39.99192227116548
+7 {'epochs': 200, 'eta': 1e-05, 'topology': [20, 15, 2]} 397.9680351422765
+
+"Decay learning rate" consists of 4 models
+0 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 100, 'topology': [20, 15, 2]} 4.326106663351986
+1 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 200, 'topology': [20, 15, 2]} 3.897324608790014
+2 {'epochs': 200, 'eta': 0.05, 'eta_zero': 0.1, 'tau': 100, 'topology': [20, 15, 2]} 2.5738202231143212
+3 {'epochs': 200, 'eta': 0.05, 'eta_zero': 0.1, 'tau': 200, 'topology': [20, 15, 2]} 2.4202005104700093
+
+"Minibatch-bigstep" consists of 4 models
+0 {'epochs': 200, 'eta': 1, 'minibatch': 1, 'topology': [20, 15, 2]} 1169.2423617594093
+1 {'epochs': 200, 'eta': 1, 'minibatch': 4, 'topology': [20, 15, 2]} 5225.60752734191
+2 {'epochs': 200, 'eta': 0.5, 'minibatch': 1, 'topology': [20, 15, 2]} 364.68825857936787
+3 {'epochs': 200, 'eta': 0.5, 'minibatch': 4, 'topology': [20, 15, 2]} 2106.376691982402
+
+"Tikhonov regularization (L2)" consists of 5 models
+0 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0} 3.1653301708442907
+1 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.1} 72.97223398551978
+2 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.01} 15.406298114676833
+3 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.001} 5.113804961410309
+4 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.0001} 3.120619028998532
+
+"Momentum" consists of 5 models
+0 {'epochs': 200, 'momentum': 0, 'topology': [20, 15, 2]} 3.3311292906923886
+1 {'epochs': 200, 'momentum': 0.5, 'topology': [20, 15, 2]} 3.237577366086567
+2 {'epochs': 200, 'momentum': 0.9, 'topology': [20, 15, 2]} 3.2409323590831303
+3 {'epochs': 200, 'momentum': 0.99, 'topology': [20, 15, 2]} 3.020484600326599
+4 {'epochs': 200, 'momentum': 0.999, 'topology': [20, 15, 2]} 7.205731066301178
+
+"Gradient clipping" consists of 4 models
+0 {'epochs': 200, 'max_norm': 1, 'topology': [20, 15, 2]} 3.1992750233524
+1 {'epochs': 200, 'max_norm': 2, 'topology': [20, 15, 2]} 3.2272446330876714
+2 {'epochs': 200, 'max_norm': 10, 'topology': [20, 15, 2]} 3.2052448210065636
+3 {'epochs': 200, 'max_norm': 100, 'topology': [20, 15, 2]} 2.0033511950755445
+
+"Activation functions" consists of 3 models
+0 {'epochs': 200, 'f_hidden': 'tanh', 'topology': [20, 15, 2]} 3.1444593600146793
+1 {'epochs': 200, 'f_hidden': 'sigmoid', 'topology': [20, 15, 2]} 3.725190059038913
+2 {'epochs': 200, 'f_hidden': 'relu', 'topology': [20, 15, 2]} 3.200985746313758

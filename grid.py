@@ -8,7 +8,13 @@ class Grid:
     """
 
     def __init__(self, grid):
-        self.grid = grid
+        self.grid   = grid
+        self.length = 0
+        for p in self.grid:
+            items = sorted(p.items())
+            keys, values = zip(*items)
+            for v in product(*values):
+                self.length += 1
 
     def __iter__(self):
         for p in self.grid:
@@ -21,3 +27,6 @@ class Grid:
                 # Assign each value to a key
                 params = dict(zip(keys, v))
                 yield params
+
+    def __len__(self):
+        return self.length

@@ -34,8 +34,7 @@ def cross_validation(model,x,y,loss,k=5):
     folds = list(map(estimate,range(k)))
     tr_loss = sum([tr_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
     vl_loss = sum([vl_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
-    # TODO: floor or ceil?
-    epoch   = int(np.ceil(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
+    epoch   = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
 
     return (tr_loss,vl_loss,epoch)
 
@@ -55,6 +54,8 @@ class Validation:
     """
     def model_selection(self,hp,x,y,k):
         grid = Grid(hp)
+        if self.verbose:
+            print(str(k)+'-fold CV over',len(grid),'possible models')
 
         # Avoid order bias
         x, y = shuffle(x, y)
@@ -65,8 +66,12 @@ class Validation:
 
         model_vl = np.Inf
         for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
-            # if tol is set don't add the 'learned' epochs to the model
-            if 'tol' not in p:
+            """
+            The leaned epochs should be added only if
+            the training used early stopping on the
+            validation set.
+            """
+            if 'epochs' not in p and 'prefer_tr' in p and not p['prefer_tr']:
                 p = {**p, 'epochs': epoch }
 
             """
