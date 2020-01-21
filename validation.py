@@ -34,8 +34,7 @@ def cross_validation(model,x,y,loss,k=5):
     folds = list(map(estimate,range(k)))
     tr_loss = sum([tr_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
     vl_loss = sum([vl_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
-    # TODO: floor or ceil?
-    epoch   = int(np.ceil(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
+    epoch   = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
 
     return (tr_loss,vl_loss,epoch)
 
@@ -55,6 +54,8 @@ class Validation:
     """
     def model_selection(self,hp,x,y,k):
         grid = Grid(hp)
+        if self.verbose:
+            print('Cross-Validation over',len(grid),'possible models')
 
         # Avoid order bias
         x, y = shuffle(x, y)
