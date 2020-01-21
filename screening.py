@@ -21,18 +21,6 @@ these are differently overwritten
 """
 init = {
         'topology': [[20,15,2]],
-        # 'f_hidden': ['tanh'],
-        # 'f_output': ['identity'],
-        # 'eta': [1e-2],
-        # 'weight_decay': [0],
-        # 'momentum': [0],
-        # 'minibatch': [32],
-        # 'tol': [0.0],
-        # 'patience': [20],
-        # 'max_epochs': [3000],
-        # 'max_norm': [0],
-        # 'tau': [1],
-        # 'eta_zero': [5e-1],
        }
 
 """
@@ -82,7 +70,7 @@ if __name__ == '__main__':
     experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [1,2], 'eta': [5e-1, 5e-2, 5e-3], 'tau': [200,500,1000], 'epochs': [epoch]}]))
     experiments.append(Experiment('Minibatch-bigstep', [{**init, 'eta': [1,0.5], 'minibatch': [1,4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Tikhonov regularization (L2)', [{**init, 'weight_decay': [0,1e-1,1e-2,1e-3,1e-4], 'epochs': [epoch]}]))
-    experiments.append(Experiment('Momentum', [{**init, 'weight_decay': [0,0.5,0.9,0.99,0.999], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Momentum', [{**init, 'momentum': [0,0.5,0.9,0.99,0.999], 'epochs': [epoch]}]))
     experiments.append(Experiment('Gradient clipping', [{**init, 'max_norm': [1,2,10,100], 'epochs': [epoch]}]))
     experiments.append(Experiment('Activation functions', [{**init, 'f_hidden': ['tanh','sigmoid','relu'], 'epochs': [epoch]}]))
 
