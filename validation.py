@@ -55,7 +55,7 @@ class Validation:
     def model_selection(self,hp,x,y,k):
         grid = Grid(hp)
         if self.verbose:
-            print('Cross-Validation over',len(grid),'possible models')
+            print(str(k)+'-fold CV over',len(grid),'possible models')
 
         # Avoid order bias
         x, y = shuffle(x, y)
