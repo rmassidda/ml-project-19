@@ -50,7 +50,6 @@ if __name__ == '__main__':
 
     # File name
     train_fp = 'data/ML-CUP19-TR.csv'
-    test_fp  = 'data/ML-CUP19-TS.csv'
 
     # Data parsing
     x       = np.genfromtxt(train_fp,delimiter=',',usecols=range(1,21))
