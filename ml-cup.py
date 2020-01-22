@@ -45,13 +45,33 @@ if __name__ == '__main__':
 
     # Hyperparameters
     common = {
-            'topology': [[20,30,2],[20,15,2],[20,15,10,2]]
+            'topology': [[20,30,2],[20,15,2],[20,5,2],[20,10,10,2]],
+            'f_hidden': ['tanh'],
+            'eta': [0.1,0.05],
+            'weight_decay': [0.01,0.001],
+            'momentum': [0.9,0.99],
+            'minibatch': [32],
+            'max_norm': [0],
+            'prefer_tr': [False],
+            'patience': [20]
            }
-    vl_early_stop = {**common, 'prefer_tr': [False] }
-    tr_early_stop = {**common}
-    fixed_epoch   = {**common, 'epochs': [100] }
+    # Overwriting cases
+    relu = {
+            'f_hidden': ['relu'],
+            'max_norm': [100]
+            }
+    decay_eta = {
+            'tau': [200],
+            'eta_zero': [0.5],
+            'eta': [0.005]
+            }
 
-    family = [vl_early_stop,tr_early_stop,fixed_epoch]
+    family = [
+            {**common},
+            {**common, **relu},
+            {**common, **decay_eta},
+            {**common, **relu, **decay_eta},
+            ]
 
     # Validation
     val = Validation(['MEE'],workers=par_deg,verbose=True)

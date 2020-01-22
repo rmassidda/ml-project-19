@@ -108,6 +108,37 @@ Table: (Plot of MSE and accuracy for the MONK’s benchmark) \label{monks_plots}
 
 ## Cup Results
 
+### Screening
+A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters that will be used for the grid search in the model selection phase.
+The result of this research is summarized in table \ref{grid_ranges}, while various plots of the learning curves we refer to can be found in the appendix.
+
+Other then finding good fixed step size it has been experimentally verified that when using decaying step size an high initial value $\eta_0$ can lead to an oscillating behavior, despite respecting the ratio $\eta_\tau = \frac{\eta_0}{\tau}$ as advised[@goodfellow_deep_2016].
+
+Another combination proven to produce a chaotic learning curve, due to the noise produced, is the binding of a relatively high learning rate with a small minibatch size, to avoid so we explore only models with a consistent size.
+
+As expected we noticed the Tikhonov regularization (L2), $\lambda$, and the momentum $\alpha$ to be more effective respectively with values nearer to 0 for the former and to 1 for the latter.
+
+For what concerns the activation functions we haven't been able to discriminate them in this phase, but we observed that the ReLU function caused numerical issues that lead to the introduction of gradient clipping.
+
+The number of units is also treated as an hyperparameter, we try different order of magnitude and also to use multiple layers.
+
+Table: (Range of hyperparameters used in the grid search) \label{grid_ranges}
+
+| Hyperparameter | Implementation | Values |
+|--|--|--|
+| $\eta$ | `eta` | $0.5,0.1,0.05,0.01$ |
+| $\tau$ | `tau` | $100,200$ |
+| $\eta_0$ | `eta_zero` | $1\mathrm{e}{-10}$ |
+| $\lambda$ | `weight_decay` | $10^{-2}, 10^{-3}$ | 
+| $\alpha$ | `momentum` | $1-10^{-1}, 1-10^{-2}$ | 
+
+### Model selection
+
+### Model assessment
+
 # Conclusions
 
 # References
+<div id="refs"></div>
+
+# Appendix
