@@ -1,49 +1,68 @@
-Train set	529	0.29971671388101984
-Run of 7 experiments
+Train set	176	0.09971671388101983
+Run of 8 experiments
 
 "Fixed learning rate" consists of 8 models
-0 {'epochs': 200, 'eta': 1, 'topology': [20, 15, 2]} 6.331531522139996
-1 {'epochs': 200, 'eta': 0.5, 'topology': [20, 15, 2]} 3.146213079578833
-2 {'epochs': 200, 'eta': 0.1, 'topology': [20, 15, 2]} 2.3582579182933348
-3 {'epochs': 200, 'eta': 0.05, 'topology': [20, 15, 2]} 2.3298521085506922
-4 {'epochs': 200, 'eta': 0.01, 'topology': [20, 15, 2]} 3.299121116917965
-5 {'epochs': 200, 'eta': 0.001, 'topology': [20, 15, 2]} 5.665895012959169
-6 {'epochs': 200, 'eta': 0.0001, 'topology': [20, 15, 2]} 39.99192227116548
-7 {'epochs': 200, 'eta': 1e-05, 'topology': [20, 15, 2]} 397.9680351422765
+0 {'epochs': 200, 'eta': 1, 'topology': [20, 15, 2]} 15.295817557113532
+1 {'epochs': 200, 'eta': 0.5, 'topology': [20, 15, 2]} 3.112441820482686
+2 {'epochs': 200, 'eta': 0.1, 'topology': [20, 15, 2]} 2.2542645414631917
+3 {'epochs': 200, 'eta': 0.05, 'topology': [20, 15, 2]} 2.521080318408892
+4 {'epochs': 200, 'eta': 0.01, 'topology': [20, 15, 2]} 3.2346240986146078
+5 {'epochs': 200, 'eta': 0.001, 'topology': [20, 15, 2]} 10.618540535255717
+6 {'epochs': 200, 'eta': 0.0001, 'topology': [20, 15, 2]} 198.46763156549304
+7 {'epochs': 200, 'eta': 1e-05, 'topology': [20, 15, 2]} 435.654983785013
 
 "Decay learning rate" consists of 4 models
-0 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 100, 'topology': [20, 15, 2]} 4.326106663351986
-1 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 200, 'topology': [20, 15, 2]} 3.897324608790014
-2 {'epochs': 200, 'eta': 0.05, 'eta_zero': 0.1, 'tau': 100, 'topology': [20, 15, 2]} 2.5738202231143212
-3 {'epochs': 200, 'eta': 0.05, 'eta_zero': 0.1, 'tau': 200, 'topology': [20, 15, 2]} 2.4202005104700093
+0 {'epochs': 200, 'eta': 0.005, 'eta_zero': 0.5, 'tau': 100, 'topology': [20, 15, 2]} 3.5727348531513345
+1 {'epochs': 200, 'eta': 0.005, 'eta_zero': 0.5, 'tau': 200, 'topology': [20, 15, 2]} 3.222256412989206
+2 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 100, 'topology': [20, 15, 2]} 4.136002939917029
+3 {'epochs': 200, 'eta': 0.001, 'eta_zero': 0.1, 'tau': 200, 'topology': [20, 15, 2]} 3.3292547553770895
+
+"Oscillating decay learning rate" consists of 4 models
+0 {'epochs': 200, 'eta': 0.05, 'eta_zero': 5, 'tau': 100, 'topology': [20, 15, 2]} 1.7643450551336316e+36
+1 {'epochs': 200, 'eta': 0.05, 'eta_zero': 5, 'tau': 200, 'topology': [20, 15, 2]} 6.186715674416807e+90
+2 {'epochs': 200, 'eta': 0.01, 'eta_zero': 1, 'tau': 100, 'topology': [20, 15, 2]} 5.068823772090453
+3 {'epochs': 200, 'eta': 0.01, 'eta_zero': 1, 'tau': 200, 'topology': [20, 15, 2]} 4.909584508252798
 
 "Minibatch-bigstep" consists of 4 models
-0 {'epochs': 200, 'eta': 1, 'minibatch': 1, 'topology': [20, 15, 2]} 1169.2423617594093
-1 {'epochs': 200, 'eta': 1, 'minibatch': 4, 'topology': [20, 15, 2]} 5225.60752734191
-2 {'epochs': 200, 'eta': 0.5, 'minibatch': 1, 'topology': [20, 15, 2]} 364.68825857936787
-3 {'epochs': 200, 'eta': 0.5, 'minibatch': 4, 'topology': [20, 15, 2]} 2106.376691982402
+0 {'epochs': 200, 'eta': 1, 'minibatch': 1, 'topology': [20, 15, 2]} 731.6221925869986
+1 {'epochs': 200, 'eta': 1, 'minibatch': 4, 'topology': [20, 15, 2]} 306.35193748538717
+2 {'epochs': 200, 'eta': 0.5, 'minibatch': 1, 'topology': [20, 15, 2]} 365.63750367443646
+3 {'epochs': 200, 'eta': 0.5, 'minibatch': 4, 'topology': [20, 15, 2]} 180.22096643788132
 
 "Tikhonov regularization (L2)" consists of 5 models
-0 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0} 3.1653301708442907
-1 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.1} 72.97223398551978
-2 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.01} 15.406298114676833
-3 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.001} 5.113804961410309
-4 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.0001} 3.120619028998532
+0 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0} 3.256676585056649
+1 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.1} 73.46138718129757
+2 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.01} 14.338679697054966
+3 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.001} 3.9800649118526756
+4 {'epochs': 200, 'topology': [20, 15, 2], 'weight_decay': 0.0001} 3.1959960722144527
 
 "Momentum" consists of 5 models
-0 {'epochs': 200, 'momentum': 0, 'topology': [20, 15, 2]} 3.3311292906923886
-1 {'epochs': 200, 'momentum': 0.5, 'topology': [20, 15, 2]} 3.237577366086567
-2 {'epochs': 200, 'momentum': 0.9, 'topology': [20, 15, 2]} 3.2409323590831303
-3 {'epochs': 200, 'momentum': 0.99, 'topology': [20, 15, 2]} 3.020484600326599
-4 {'epochs': 200, 'momentum': 0.999, 'topology': [20, 15, 2]} 7.205731066301178
+0 {'epochs': 200, 'momentum': 0, 'topology': [20, 15, 2]} 3.2583345038923106
+1 {'epochs': 200, 'momentum': 0.5, 'topology': [20, 15, 2]} 3.172221208044486
+2 {'epochs': 200, 'momentum': 0.9, 'topology': [20, 15, 2]} 3.2819828404574456
+3 {'epochs': 200, 'momentum': 0.99, 'topology': [20, 15, 2]} 3.4393323598920507
+4 {'epochs': 200, 'momentum': 0.999, 'topology': [20, 15, 2]} 31.813636105146752
 
 "Gradient clipping" consists of 4 models
-0 {'epochs': 200, 'max_norm': 1, 'topology': [20, 15, 2]} 3.1992750233524
-1 {'epochs': 200, 'max_norm': 2, 'topology': [20, 15, 2]} 3.2272446330876714
-2 {'epochs': 200, 'max_norm': 10, 'topology': [20, 15, 2]} 3.2052448210065636
-3 {'epochs': 200, 'max_norm': 100, 'topology': [20, 15, 2]} 2.0033511950755445
+0 {'epochs': 200, 'max_norm': 1, 'topology': [20, 15, 2]} 3.2479584177805774
+1 {'epochs': 200, 'max_norm': 2, 'topology': [20, 15, 2]} 3.269801785468375
+2 {'epochs': 200, 'max_norm': 10, 'topology': [20, 15, 2]} 3.357096724331396
+3 {'epochs': 200, 'max_norm': 100, 'topology': [20, 15, 2]} 1.8067783005117501
 
 "Activation functions" consists of 3 models
-0 {'epochs': 200, 'f_hidden': 'tanh', 'topology': [20, 15, 2]} 3.1444593600146793
-1 {'epochs': 200, 'f_hidden': 'sigmoid', 'topology': [20, 15, 2]} 3.725190059038913
-2 {'epochs': 200, 'f_hidden': 'relu', 'topology': [20, 15, 2]} 3.200985746313758
+0 {'epochs': 200, 'f_hidden': 'tanh', 'topology': [20, 15, 2]} 3.3506727028754204
+1 {'epochs': 200, 'f_hidden': 'sigmoid', 'topology': [20, 15, 2]} 4.30754127358549
+2 {'epochs': 200, 'f_hidden': 'relu', 'topology': [20, 15, 2]} 3.4702944013758112
+
+"Assess different values of patience," consists of 10 models
+10-fold cross validation
+{'patience': 1, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 39}	13.649828858564003	13.069830217921984	1.0782448530197144
+{'patience': 2, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 71}	9.358610710765161	8.262296212348796	1.9434399127960205
+{'patience': 4, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 154}	3.7510464105064387	4.041086284314414	4.258309316635132
+{'patience': 8, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 207}	3.564903922675451	3.674328952821045	5.309266400337219
+{'patience': 16, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 309}	3.136955126870644	3.595161381792463	7.332116675376892
+{'patience': 32, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 236}	3.136569191859081	3.832494812861018	6.187459087371826
+{'patience': 64, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 248}	3.2515729733888405	3.268013688934434	7.7515202283859255
+{'patience': 128, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 373}	3.146595153279893	3.5288888557958273	8.779356288909913
+{'patience': 256, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 563}	3.085762997256863	3.1550083971497562	11.874682664871216
+{'patience': 512, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 623}	2.955754499161358	3.0366704533635636	14.627531051635742
