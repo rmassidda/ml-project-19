@@ -1,6 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib import pyplot as plt
 from network import Network
+from validation import Validation, cross_validation
 from grid import Grid
 from random import sample
 import numpy as np
@@ -39,13 +40,14 @@ results and output the relative plots.
 """
 if __name__ == '__main__':
 
-    if len(sys.argv) == 5:
+    if len(sys.argv) == 6:
         n_trials = int(sys.argv[1])
         max_w    = int(sys.argv[2])
         epoch    = int(sys.argv[3])
-        coverage = float(sys.argv[4])
+        k        = int(sys.argv[4])
+        coverage = float(sys.argv[5])
     else:
-        print('Usage:',sys.argv[0],'n_trials max_w epoch coverage',file=sys.stderr)
+        print('Usage:',sys.argv[0],'n_trials max_w epoch k coverage',file=sys.stderr)
         sys.exit(1)
 
     # File name
@@ -118,3 +120,37 @@ if __name__ == '__main__':
         counter += 1
         plt.cla()
         plt.clf()
+
+    # Special case to assess the patience
+    name = 'Assess different values of patience,'
+    val  = Validation(['MEE'],workers=max_w)
+    pat  = [1,2,4,8,16,32,64,128,256,512]
+    lss  = []
+    eph  = []
+    hp   = [{**init, 'prefer_tr': [False], 'patience': pat}]
+    grid = Grid(hp)
+
+    print('\n"'+name+'"','consists of',len(grid),'models')
+    print(str(k)+'-fold cross validation')
+
+    p = functools.partial(cross_validation,x=train_x,y=train_y,loss=['MSE'],k=k)
+    res = executor.map(p,grid)
+    for p, (tr_loss,vl_loss,epoch, period) in zip(grid,res):
+        p = {**p, 'epochs': epoch }
+        print(p,tr_loss,vl_loss,period,sep='\t')
+        lss.append(vl_loss)
+        eph.append(epoch)
+
+    plt.title(name+' validation MSE')
+    plt.plot(pat, lss, label='Model '+str(counter))
+    plt.xlabel('Patience')
+    plt.ylabel('MSE')
+    plt.savefig('screening_'+str(counter)+'.png', dpi=300)
+    counter += 1
+    plt.cla()
+    plt.clf()
+    plt.title(name+' epochs')
+    plt.plot(pat, eph, label='Model '+str(counter))
+    plt.xlabel('Patience')
+    plt.ylabel('epochs')
+    plt.savefig('screening_'+str(counter)+'.png', dpi=300)
