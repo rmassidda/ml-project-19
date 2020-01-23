@@ -53,7 +53,7 @@ if __name__ == '__main__':
             'minibatch': [32],
             'max_norm': [0],
             'prefer_tr': [False],
-            'patience': [20]
+            'patience': [100]
            }
     # Overwriting cases
     relu = {
