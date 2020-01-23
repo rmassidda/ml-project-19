@@ -4,17 +4,24 @@ from network import Network
 from utils import shuffle, loss_dict
 import numpy as np
 import functools
+import time
 
 """
 Cross-Validation
 Given a model and a dataset it partitions it
-by using the K-Hold CV algorithm.
+by using the K-Fold CV algorithm.
 It the returns the empirical risk.
 """
 def cross_validation(model,x,y,loss,k=5):
-    x, y = shuffle(x, y)
     batch = np.int64(np.ceil(len(x)/k))
 
+    """
+    Each estimate uses one fold as the
+    validation set and the others as
+    training set, then return the number
+    of epochs of training, other than the
+    error on the TR and VL folds.
+    """
     def estimate(i):
         rows = range(i*batch,min((i+1)*batch,len(x)-1))
         tr_x = np.delete(x,rows,0)
@@ -22,21 +29,24 @@ def cross_validation(model,x,y,loss,k=5):
         vl_x = x[rows]
         vl_y = y[rows]
         nn = Network(**model)
+        start = time.time()
         tr_loss, vl_loss, epoch = nn.train(tr_x,tr_y,vl_x,vl_y,loss)
-        return (tr_loss,vl_loss,epoch)
+        end = time.time()
+        return (tr_loss[0][epoch],vl_loss[0][epoch],epoch,end-start)
 
     """
-    Using K-hold cross validation the best
+    Using K-fold cross validation the best
     average number of epochs is found.
     Also the empirical risk is computed
     as the average on the risk per fold.
     """
-    folds = list(map(estimate,range(k)))
-    tr_loss = sum([tr_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
-    vl_loss = sum([vl_loss[0][epoch] for tr_loss,vl_loss,epoch in folds])/k
-    epoch   = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch in folds])/k))
+    folds   = list(map(estimate,range(k)))
+    tr_loss = sum([tr_loss for tr_loss,vl_loss,epoch,period in folds])/k
+    vl_loss = sum([vl_loss for tr_loss,vl_loss,epoch,period in folds])/k
+    epoch   = int(np.floor(sum([epoch for tr_loss,vl_loss,epoch,period in folds])/k))
+    period  = sum([period for tr_loss,vl_loss,epoch,period in folds])/k
 
-    return (tr_loss,vl_loss,epoch)
+    return (tr_loss,vl_loss,epoch,period)
 
 class Validation:
     def __init__(self,loss,workers=16,verbose=True):
@@ -64,8 +74,9 @@ class Validation:
         p = functools.partial(cross_validation,x=x,y=y,loss=self.loss,k=k)
         res = self.executor.map(p,grid)
 
-        model_vl = np.Inf
-        for p, (tr_loss,vl_loss,epoch) in zip(grid,res):
+        model_vl   = np.Inf
+        avg_period = 0
+        for p, (tr_loss,vl_loss,epoch,period) in zip(grid,res):
             """
             The leaned epochs should be added only if
             the training used early stopping on the
@@ -91,8 +102,17 @@ class Validation:
                 model    = p
 
             if self.verbose:
-                print(p,tr_loss,vl_loss,sep='\t')
+                print(p,tr_loss,vl_loss,period,sep='\t')
 
+            """
+            Average time for the training
+            over a fold
+            """
+            avg_period += period
+
+        avg_period /= len(grid)
+        if self.verbose:
+            print('Average training time per fold', avg_period)
 
         """
         The training and the validation curves of the model are returned.

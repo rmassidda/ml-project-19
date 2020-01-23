@@ -73,6 +73,8 @@ if __name__ == '__main__':
             {**common, **relu, **decay_eta},
             ]
 
+    # family = [{'topology': [[20,10,2]], 'epochs': [2,5,20]}]
+
     # Validation
     val = Validation(['MEE'],workers=par_deg,verbose=True)
     start = time.time()
