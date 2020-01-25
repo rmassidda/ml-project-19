@@ -69,7 +69,8 @@ if __name__ == '__main__':
     experiments = []
     experiments.append(Experiment('Fixed learning rate', [{**init, 'eta': [1,5e-1,1e-1,5e-2,1e-2,1e-3,1e-4,1e-5], 'epochs': [epoch]}]))
     experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [5e-1], 'eta': [5e-3], 'tau': [100,200], 'epochs': [epoch]},
-        {**init, 'eta_zero': [1e-1], 'eta': [1e-3], 'tau': [100,200], 'epochs': [epoch]}]))
+        {**init, 'eta_zero': [1e-1], 'eta': [1e-3], 'tau': [100,200], 'epochs': [epoch]},
+        {**init, 'eta_zero': [1e-0], 'eta': [1e-2], 'tau': [100,200], 'epochs': [epoch]}]))
     experiments.append(Experiment('Oscillating decay learning rate', [{**init, 'eta_zero': [5], 'eta': [5e-2], 'tau': [100,200], 'epochs': [epoch]},
         {**init, 'eta_zero': [1], 'eta': [1e-2], 'tau': [100,200], 'epochs': [epoch]}]))
     experiments.append(Experiment('Minibatch-bigstep', [{**init, 'eta': [1,0.5], 'minibatch': [1,4], 'epochs': [epoch]}]))
