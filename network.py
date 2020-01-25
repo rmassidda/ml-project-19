@@ -213,7 +213,7 @@ class Network:
                     training = False
 
             if epoch == self.max_epochs:
-                traininng = false
+                training = False
 
             epoch += 1
 
