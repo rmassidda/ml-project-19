@@ -1,0 +1,33 @@
+Train set       1412    0.8
+Test set        353     0.2
+Model selection
+5-fold CV over 18 possible models
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 2.5136455465540135}   2.5136455465540135      2.5347872391936686      134.2423044681549
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 2.3644504615494752}   2.3644504615494752      2.3881056899773183      136.39187049865723
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 2.5041277786481606}  2.5041277786481606      2.5258323956558124      134.89565930366516
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 2.356778860228201}   2.356778860228201       2.3802693074919468      136.08109140396118
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 2.559535243940703}      2.559535243940703       2.580678652354929       135.0199083805084
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 2.4022099664726477}     2.4022099664726477      2.426076418835348       136.1124376773834
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3675524377765782}    1.3675524377765782      1.4049637638503758      133.26408944129943
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.380556898691595}     1.380556898691595       1.4158900089444864      136.2857626914978
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3662544794271754}   1.3662544794271754      1.3997455287936076      177.2713994026184
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.3811604052722941}   1.3811604052722941      1.413255585925468       179.2269232749939
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.377185845487996}       1.377185845487996       1.4095313538856165      178.33152151107788
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 200, 'prefer_tr': False, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.3863308052216639}      1.3863308052216639      1.415190779897291       180.62751550674437
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.2788008941965865}       1.2788008941965865      1.311404565106422 144.82541489601135
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.1929934944886695}       1.1929934944886695      1.2644360506056995        127.27800817489624
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3379050261743224}      1.3379050261743224      1.3573511054552256        179.35134348869323
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.3161785868760165}      1.3161785868760165      1.3441424607001233        179.14432883262634
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.30401602510799}   1.30401602510799        1.3596221005417284      81.0545175075531
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 185258272.81459942} 185258272.81459942      186784508.5538326       60.63043990135193
+Average training time per fold 142.77969646453857
+Chosen model:
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.1929934944886695} 1.1929934944886695 1.2644360506056995
+
+Time for model selection: 1722.257857
+Model assessment
+Chosen model:
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.1929934944886695} 1.329655189948993
+Time for model assessment: 67.262707
+Total time elapsed: 1789.520564
+Start plotting

@@ -1,0 +1,35 @@
+    # Hyperparameters
+    common = {
+        'topology': [[20,30,2],[20,40,2]],
+        'f_hidden': ['tanh'],
+        'eta': [1e-4,1e-3],
+        'weight_decay': [1e-4],
+        'momentum': [1-1e-1,1-1e-2,0],
+        'minibatch': [32],
+        'max_norm': [0],
+        'prefer_tr': [False],
+        'patience': [200]
+        }
+
+    # relu = {
+    #         'f_hidden': ['relu'],
+    #         'max_norm': [100]
+    #     }
+    decay_eta = {
+            'tau': [500],
+            'eta_zero': [0.1],
+            'eta': [0.001],
+            'patience': [500]
+        }
+
+    family = [
+            {**common},
+            # {**common, **relu},
+            {**common, **decay_eta},
+            # {**common, **relu, **decay_eta},
+            ]
+    
+    #family = [{'topology': [[20,23,2], [20,15,2]], 'prefer_tr': [False], 'patience': [100], 'eta': [0.01]}]
+
+    # family = [{'topology': [[20,10,2]], 'epochs': [2,5,20]}]
+
