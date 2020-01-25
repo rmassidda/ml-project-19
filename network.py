@@ -90,6 +90,14 @@ class Network:
         self.prefer_tr = prefer_tr
         self.target_loss = target_loss
 
+        """
+        If the user provided a fixed number of
+        epochs, than the maximum allowed should
+        be equivalent to the value provided.
+        """
+        if epochs is not None:
+            self.max_epochs = epochs
+
         self.n_layers = len(topology)
         self.weights = None
         self.biases = None
@@ -195,7 +203,7 @@ class Network:
                     best_loss  = curr_loss
                     best_epoch = epoch
 
-                if no_improvement >= self.patience or epoch == self.max_epochs:
+                if no_improvement >= self.patience:
                     training = False
             else:
                 if self.epochs is not None and epoch >= self.epochs:
@@ -203,6 +211,9 @@ class Network:
                     training = False
                 elif self.target_loss is not None and tr_losses[0][epoch] <= self.target_loss:
                     training = False
+
+            if epoch == self.max_epochs:
+                traininng = false
 
             epoch += 1
 
