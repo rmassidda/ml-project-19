@@ -62,7 +62,7 @@ class Validation:
     - loss over the validation set
     - the best model
     """
-    def model_selection(self,hp,x,y,k):
+    def model_selection(self,hp,x,y,k,target_loss=True):
         grid = Grid(hp)
         if self.verbose:
             print(str(k)+'-fold CV over',len(grid),'possible models')
@@ -78,12 +78,15 @@ class Validation:
         avg_period = 0
         for p, (tr_loss,vl_loss,epoch,period) in zip(grid,res):
             """
-            The leaned epochs should be added only if
-            the training used early stopping on the
-            validation set.
+            The learned epochs, or the target loss,
+            should be added only if the training 
+            used early stopping on the validation set.
             """
             if 'epochs' not in p and 'prefer_tr' in p and not p['prefer_tr']:
-                p = {**p, 'target_loss': tr_loss}
+                if target_loss:
+                    p = {**p, 'target_loss': tr_loss}
+                else:
+                    p = {**p, 'epochs': epoch}
 
             """
             Each item in the list of results per
