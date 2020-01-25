@@ -69,8 +69,8 @@ class Network:
     def __init__(self, topology, activations=None, f_hidden='tanh',
                  f_output='identity', eta=1e-2, weight_decay=1e-4,
                  momentum=0.9, minibatch=32, epochs=None, tol=0.0,
-                 patience=20, max_epochs=3000, max_norm=1,
-                 tau=1, eta_zero=5e-1, prefer_tr=True):
+                 patience=20, max_epochs=800, max_norm=1,
+                 tau=1, eta_zero=5e-1, prefer_tr=True, target_loss=None):
         self.topology = topology
         self.activations = activations
         self.f_hidden = f_hidden
@@ -88,6 +88,7 @@ class Network:
         self.eta_zero = eta_zero
         self.eta_tau  = eta
         self.prefer_tr = prefer_tr
+        self.target_loss = target_loss
 
         self.n_layers = len(topology)
         self.weights = None
@@ -140,9 +141,11 @@ class Network:
         tr_losses = np.empty((len(losses),self.max_epochs+1))
         vl_losses = np.empty((len(losses),self.max_epochs+1))
 
-        vl_stop = True if self.epochs is None and val_x is not None and val_y is not None \
-                and not self.prefer_tr else False
-        tr_stop = True if self.epochs is None and not vl_stop else False
+        vl_stop = True if self.epochs is None and self.target_loss is None \
+                    and val_x is not None and val_y is not None \
+                    and not self.prefer_tr else False
+        tr_stop = True if self.epochs is None and self.target_loss is None \
+                    and not vl_stop else False
         early_stop = vl_stop or tr_stop
 
         no_improvement = 0
@@ -194,9 +197,12 @@ class Network:
 
                 if no_improvement >= self.patience or epoch == self.max_epochs:
                     training = False
-            elif epoch >= self.epochs:
-                # Stop training when the prefixed number of epochs has been reached
-                training = False
+            else:
+                if self.epochs is not None and epoch >= self.epochs:
+                    # Stop training when the prefixed number of epochs has been reached
+                    training = False
+                elif self.target_loss is not None and tr_losses[0][epoch] <= self.target_loss:
+                    training = False
 
             epoch += 1
 

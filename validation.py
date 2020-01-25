@@ -83,7 +83,7 @@ class Validation:
             validation set.
             """
             if 'epochs' not in p and 'prefer_tr' in p and not p['prefer_tr']:
-                p = {**p, 'epochs': epoch }
+                p = {**p, 'target_loss': tr_loss}
 
             """
             Each item in the list of results per

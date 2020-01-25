@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from network import Network
-from utils import shuffle
+from utils import shuffle, loss_dict
 import pandas as pd
 
 # Parse the dataset
@@ -15,28 +15,33 @@ n_outputs = y.shape[1]
 x, y = shuffle(x, y)
 
 # TR/VL split
-bound = int(len(x) * 0.75)
-tr_x, tr_y, ts_x, ts_y = x[:bound], y[:bound], x[bound:], y[bound:]
+bound_ts = int(len(x) * 0.8)
+bound_tr = int(len(x) * 0.6)
+dev_x, dev_y, ts_x, ts_y = x[:bound_ts], y[:bound_ts], x[bound_ts:], y[bound_ts:]
+tr_x, tr_y, val_x, val_y = dev_x[:bound_tr], dev_y[:bound_tr], dev_x[bound_tr:], dev_y[bound_tr:]
 
 # Net params
-activations = None
-f_hidden = 'relu'
-f_output = 'identity'
-batch_size = 32
-hidden_units = 30
-eta = 0.001
-momentum = 0.9
-weight_decay = 0.001
-epochs = 100
-tol = None
-patience = 10
-losses = ['MEE', 'MSE']
+params = {
+    "topology": [n_inputs, 32, 2],
+    "f_hidden": 'tanh',
+    "minibatch": 32,
+    "eta": 0.0005,
+    "momentum": 0.9,
+    "weight_decay": 0,
+    "patience": 100,
+    "max_norm": 0,
+    "prefer_tr": False,
+    'tau': 10000,
+    'eta_zero': 0.05
+}
+
+losses = ['MEE']
 
 # Training
-nn = Network([n_inputs, hidden_units, n_outputs], activations=activations, f_hidden=f_hidden,
-             f_output=f_output, minibatch=batch_size, eta=eta, weight_decay=weight_decay,
-             epochs=epochs, tol=tol, patience=patience, momentum=momentum)
-tr_losses, ts_losses, best_epoch = nn.train(tr_x, tr_y, ts_x, ts_y, verbose=True, losses=losses)
+nn = Network(**params)
+tr_losses, ts_losses, best_epoch = nn.train(tr_x, tr_y, val_x, val_y, verbose=True, losses=losses)
+
+print(nn.error(ts_x, ts_y, loss_dict['MEE']))
 
 # Plot MEE
 for i, loss in enumerate(losses):

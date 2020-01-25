@@ -47,8 +47,8 @@ if __name__ == '__main__':
     common = {
             'topology': [[20,30,2],[20,15,2],[20,23,2],[20,10,10,2]],
             'f_hidden': ['tanh'],
-            'eta': [0.1,0.05],
-            'weight_decay': [0.001,0.0001],
+            'eta': [0.05, 0.01, 0.005],
+            'weight_decay': [0.001,0.0001,0],
             'momentum': [0.9,0.99],
             'minibatch': [32],
             'max_norm': [0],
@@ -61,9 +61,9 @@ if __name__ == '__main__':
             'max_norm': [100]
             }
     decay_eta = {
-            'tau': [200],
-            'eta_zero': [0.5],
-            'eta': [0.005]
+            'tau': [10000],
+            'eta_zero': [0.05],
+            'eta': [0.0005]
             }
 
     family = [
@@ -72,6 +72,8 @@ if __name__ == '__main__':
             {**common, **decay_eta},
             {**common, **relu, **decay_eta},
             ]
+    
+    #family = [{'topology': [[20,23,2], [20,15,2]], 'prefer_tr': [False], 'patience': [100], 'eta': [0.01]}]
 
     # family = [{'topology': [[20,10,2]], 'epochs': [2,5,20]}]
 
