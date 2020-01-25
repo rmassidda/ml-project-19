@@ -1,0 +1,27 @@
+Train set       1412    0.8
+Test set        353     0.2
+Model selection
+5-fold CV over 12 possible models
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 2.4687435414785845}   2.4687435414785845      2.485301331246554       166.49310264587402
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 3.0377756484446943}   3.0377756484446943      3.056281217094386       163.16864671707154
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 2.4600549898755633}  2.4600549898755633      2.476192981539935       166.60027804374695
+{'eta': 0.0001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 3.010858566894509}   3.010858566894509       3.028204120279435       163.8035850048065
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3609545369700657}    1.3609545369700657      1.3940388931763716      166.72947430610657
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 200, 'prefer_tr': False, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 1.3841781259240935}    1.3841781259240935      1.4148882668142235      164.00091228485107
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3615587642122033}   1.3615587642122033      1.3926454896500147      166.76578068733215
+{'eta': 0.001, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 1.379641545058956}    1.379641545058956       1.40871088742973        164.3779106616974
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.329822205699238}        1.329822205699238       1.3474885732321438        61.17233810424805
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 1.3395192467391754}       1.3395192467391754      1.3759347330486509        60.56435103416443
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3209513391509677}      1.3209513391509677      1.3451780195110257        62.515188694000244
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 15, 2], 'weight_decay': 0.0001, 'target_loss': 1.3424695456933686}      1.3424695456933686      1.379557394351571 60.31120233535766
+Average training time per fold 130.54189754327135
+Chosen model:
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3209513391509677} 1.3209513391509677 1.3451780195110257
+
+Time for model selection: 1132.604438
+Model assessment
+Chosen model:
+{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3209513391509677} 1.3805071131148485
+Time for model assessment: 33.579495
+Total time elapsed: 1166.183933
+Start plotting
