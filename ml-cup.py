@@ -45,32 +45,25 @@ if __name__ == '__main__':
 
     # Hyperparameters
     common = {
-        'topology': [[20,30,2],[20,15,2],[20,10,10,2]],
+        'topology': [[20,32,15,2],[20,20,15,2],[20,30,10,2]],
         'f_hidden': ['tanh'],
-        'eta': [0.1,0.05],
-        'weight_decay': [0.01,0.001],
-        'momentum': [0.9,0.99],
+        'eta': [0.01,0.005,0.001],
+        'weight_decay': [0.0001,0.00005,0.00001],
+        'momentum': [0.9],
         'minibatch': [32],
         'max_norm': [0],
         'prefer_tr': [False],
         'patience': [100]
         }
-
-    relu = {
-            'f_hidden': ['relu'],
-            'max_norm': [100]
-        }
     decay_eta = {
             'tau': [200],
-            'eta_zero': [0.5],
-            'eta': [0.005]
+            'eta_zero': [0.1],
+            'eta': [0.01]
         }
 
     family = [
             {**common},
-            {**common, **relu},
-            {**common, **decay_eta},
-            {**common, **relu, **decay_eta},
+            {**common, **decay_eta}
             ]
     
     #family = [{'topology': [[20,23,2], [20,15,2]], 'prefer_tr': [False], 'patience': [100], 'eta': [0.01]}]

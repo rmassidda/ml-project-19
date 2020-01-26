@@ -1,3 +1,15 @@
-#! sh
+#!/bin/bash
+
+echo "----------"
 date
-for fold in exp*; do grep Chosen -m1 -A1 $fold/ml-cup.txt | tail -n1 | sed 's/^/'$fold'\t/' | awk '{print $NF,$0}'; done | sort | cut -f2- -d' '
+echo "----------"
+
+for fold in exp*; do
+    file=$fold/ml-cup.txt
+    if [ -e $file ]; then
+        tsloss=$(grep Chosen -A1 $file | tail -n1 | awk '{print($NF)}' | tr -d '\r')
+        vlline=$(grep Chosen -A1 $file | head -n2 | sed 's/^/'$fold'\t/' | tail -n1 | tr -d '\r')
+        line="$vlline $tsloss"
+        echo $line | awk '{print $(NF-1),$0}'
+    fi
+done | sort | cut -f2- -d' '

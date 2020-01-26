@@ -20,19 +20,20 @@ bound_tr = int(len(x) * 0.6)
 dev_x, dev_y, ts_x, ts_y = x[:bound_ts], y[:bound_ts], x[bound_ts:], y[bound_ts:]
 tr_x, tr_y, val_x, val_y = dev_x[:bound_tr], dev_y[:bound_tr], dev_x[bound_tr:], dev_y[bound_tr:]
 
+
 # Net params
 params = {
-    "topology": [n_inputs, 32, 2],
+    "topology": [n_inputs, 40, 2],
     "f_hidden": 'tanh',
-    "minibatch": 32,
-    "eta": 0.0005,
+    "minibatch": 64,
+    "eta": 0.01,
     "momentum": 0.9,
-    "weight_decay": 0,
+    "weight_decay": 0.0001,
     "patience": 100,
     "max_norm": 0,
     "prefer_tr": False,
-    'tau': 10000,
-    'eta_zero': 0.05
+    #'tau': 8000,
+    #'eta_zero': 0.005
 }
 
 losses = ['MEE']

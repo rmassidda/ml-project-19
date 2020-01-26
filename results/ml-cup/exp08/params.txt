@@ -1,0 +1,11 @@
+common = {
+    'topology': [[20,25,2],[20,30,2],[20,35,2]],
+    'f_hidden': ['tanh'],
+    'eta': [0.01,0.005,0.001],
+    'weight_decay': [0.001,0.0001,0.00005],
+    'momentum': [0.9],
+    'minibatch': [32,64],
+    'max_norm': [0],
+    'prefer_tr': [False],
+    'patience': [100]
+    }

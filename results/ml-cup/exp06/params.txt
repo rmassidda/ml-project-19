@@ -1,0 +1,22 @@
+# Hyperparameters
+common = {
+    'topology': [[20,30,2],[20,23,2],[20,20,10,2]],
+    'f_hidden': ['tanh'],
+    'eta': [0.05,0.01],
+    'weight_decay': [0.01,0.001],
+    'momentum': [0.9,0.99],
+    'minibatch': [32],
+    'max_norm': [0],
+    'prefer_tr': [False],
+    'patience': [100]
+    }
+
+relu = {
+        'f_hidden': ['relu'],
+        'max_norm': [100]
+    }
+decay_eta = {
+        'tau': [200],
+        'eta_zero': [0.1],
+        'eta': [0.01]
+    }
