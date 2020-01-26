@@ -2,10 +2,12 @@
 documentclass: article
 fontsize: 11pt
 bibliography: ml-2019.bib
+header-includes: |
+    \usepackage{subcaption}
 ---
 
 <!-- Pure latex to handle the title page -->
-\title{An Astonishing Title}
+\title{Machine Learning Project}
 \author{
   Emanuele Cosenza \\ 
   \href{mailto:e.cosenza3@studenti.unipi.it}{e.cosenza3@studenti.unipi.it} 
@@ -32,41 +34,48 @@ The learning algorithm is based on the backpropagation algorithm[@rumelhart_para
 
 The network also offers the possibility of using early stopping as a stopping criterion, since it is a recognized regularization technique and, furthermore, it reduces the computational time by not learning for more epochs than required.
 
-A mechanism that automatically executes a grid search over various hyperparameters combinations has been implemented to perform model selection.
-A model assessment procedure can then be executed by using a separate test set or by the double cross validation algorithm.
-
+<!-- A mechanism that automatically executes a grid search over various hyperparameters combinations has been implemented to perform model selection. -->
+<!-- A model assessment procedure can then be executed by using a separate test set or by the double cross validation algorithm. -->
 <!-- To expect the achievement of generalization all of the experiments assume a certain degree of smoothness in the source producing the data, respecting so the inductive bias of neural networks --> 
 
 # Method
-For the implementation, Python has been chosen because of its simplicity and the efficiency of its numerical libraries. In particular, the implementation is based on NumPy[@oliphant_guide_2015], which has been used to efficiently manipulate data in form of vectors and matrices. To speed up the learning process, vectorization has been exploited in operations involving vectors and matrices.
+For the implementation, Python has been chosen because of its simplicity and the efficiency of its numerical libraries.
+In particular, the implementation is based on NumPy[@oliphant_guide_2015], which has been used to efficiently manipulate data in form of vectors and matrices.
+Vectorization has been exploited to speed up the learning process.
 
 ## Network
-The `Network` class represents a neural network. By using its constructor it is possible to set all the required hyperparameters for the techniques that are described later.
-The class offers methods to learn from a set of examples via backpropagation and to predict sound outcomes for new patterns in forward mode.
+The `Network` class represents a neural network. By using its constructor it is possible to set all the required hyperparameters for the techniques that are later described.
+The class offers methods to learn from a set of examples via backpropagation and to predict outcomes for new patterns in forward mode.
 
 The initialization of the weights in each layer of the neural network is done by extracting values from a standard normal distribution with variance $\sigma = \frac{2}{n_i+n_o}$, where $n_i$ stands for the number of inputs in the considered layer and $n_o$ for the number of outputs.
 This has been proven to be a sound choice[@glorot_understanding_nodate] in various use cases.
 
-Different activation functions can be chosen for each layer of the neural network. The possible choices are: $tanh$, the standard logistic function, $ReLU$ and the identity function (used only in the output layer for regression tasks).
+Different activation functions can be chosen for each layer of the neural network. The possible choices are: $tanh$, the standard logistic function, $ReLU$ and the identity function, thought to be used only in the output layer for regression tasks.
 
-The implemented backpropagation algorithm analyzes patterns by aggregating them using the minibatch technique. The batch size is a tunable hyperparameter with possible values between 1 (online training) and the size of the training set (batch training).
+The implemented backpropagation algorithm analyzes patterns by aggregating them using the minibatch technique.
+The batch size is a tunable hyperparameter with possible values between 1 (online training) and the size of the training set (batch training).
 In the gradient descent algorithm, MSE is always used as the cost function.
 To speedup the computation, the update rule also considers momentum information, achieving convergence with a smaller number of epochs.
 Standard L2 regularization has also been implemented to avoid the overfitting of the training data.
 
-The combination of some hyperparameters could lead to numerical errors due to a gradient explosion phenomenon.[@pascanu2012difficulty].
+The combination of some hyperparameters could lead to numerical errors due to a gradient explosion phenomenon[@pascanu2012difficulty].
 This problem is dealt with by normalizing the gradient if it surpasses a certain threshold.
 
-The learning process can be terminated with three different stopping criteria:
+The learning process can be terminated with different stopping criteria, as seen in figure \ref{stop_conditions}.
+The meaning of the different scenarios is the following:
 
-- A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than the provided value.
-- An early stopping mechanism is implemented by checking if the loss on a given validation set does not improve for a fixed number of consecutive epochs.
-This solution also leads to an implicit regularization of the model, avoiding the overfitting of the dataset[@prechelt_early_nodate].
-- Given a threshold value $t$, if the loss on the training set does not improve by at least $t$ for a fixed number of consecutive epochs, the learning process is stopped.
+a. A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than the provided value.
+b. The training process is executed up to the loss on the training set reaches a certain provided value.
+c. Given a threshold value $t$, if the loss on the training set does not improve by at least $t$ for a fixed number of consecutive epochs, the learning process is stopped.
 This is equivalent to assert that the norm of the gradient in the SGD algorithm is stuck under a certain threshold.
+d. An early stopping mechanism is implemented by checking if the loss on a given validation set does not improve for a fixed number of consecutive epochs.
+This solution also leads to an implicit regularization of the model, avoiding the overfitting of the dataset[@prechelt_early_nodate].
 
-## Validation: model selection and model assessment
+All of this techniques are bounded by a tunable maximum number of epochs, this is needed to avoid situations where there are no assurances about the effectiveness of the stopping criterion like in the case `b`.
 
+![Flow chart for the stopping conditions\label{stop_conditions}](stop_conditions.svg)
+
+## Validation
 The lack of a reliable external test set led to the development of a strategy to assess the performances of the model by using an internal one.
 Because of the explicit requirement to plot the learning curve of the selected final model against both the training and the test set, double cross validation has been avoided, since it produces only a scalar value representing the risk of the family of models.
 Given this constraint in the validation procedure, the dataset is partitioned in development set and test set by random sampling without replacement in proportion $80/20\%$. The development set is then used for model selection purposes through a cross validation procedure, while the test set is used to assess the selected final model.
@@ -83,10 +92,13 @@ The mechanism hereby described is used in the script `ml-cup.py` to automaticall
 # Experiments
 
 ## MONK's dataset
-
-The results illustrated in table \ref{monks_results} and \ref{monks_plots} are obtained by averaging eight independent runs for each task.
-In all the experiments, the employed neural networks are composed by a single hidden layer containing 4 hidden units. Since all three tasks are based on binary classification, the output layer is composed by a single unit with a standard logistic function as the activation function. The network outputs are therefore in the range $(0, 1)$. To get the actual classification prediction, each output is then rounded up to the nearest integer (0 or 1).  In the hidden layer, $tanh$ is used as the activation function.
-The networks have been trained for 2000 epochs by using a minibatch of 32 examples. No further techniques are used unless otherwise noted in the tables.
+The results illustrated in table \ref{monks_results} are obtained by averaging eight independent runs for each task.
+In all the experiments, the employed neural networks are composed by a single hidden layer containing 4 hidden units.
+Since all three tasks are based on binary classification, the output layer is composed by a single unit with a standard logistic function as activation function.
+The network outputs are therefore in the range $(0, 1)$.
+To get the actual classification prediction, each output is then rounded up to the nearest integer (0 or 1).  In the hidden layer, $tanh$ is used as the activation function.
+The networks have been trained for 2000 epochs by using a minibatch of 32 examples.
+No further techniques are used in the experiments in figure \ref{fig:monks}, Tikhonov regularization is used for the Monks-3 regularized experiment in figure \ref{fig:monks-3_reg}.
 
 Table: (Experimental results over the MONK's datasets) \label{monks_results}
 
@@ -97,14 +109,37 @@ Table: (Experimental results over the MONK's datasets) \label{monks_results}
 | monks-3     | $\eta = 0.5$ | 0.0091/0.0416 | 99.18%/94.50% | 
 | monks-3-reg | $\eta = 0.5, \lambda = 0.01$ | 0.1160/0.1075 | 93.44%/97.22% | 
 
-Table: (Plot of MSE and accuracy for the MONK’s benchmark) \label{monks_plots}
-
-|  MSE (TR/TS) |  Accuracy (TR/TS) (%) |
-|--------------|------------------------|
-| ![monks-1_MSE](../results/monks_8_run/monks-1_MSE.png){ width=230px } | ![monks-1_MCL](../results/monks_8_run/monks-1_MCL.png){ width=230px } |
-| ![monks-2_MSE](../results/monks_8_run/monks-2_MSE.png){ width=230px } | ![monks-2_MCL](../results/monks_8_run/monks-2_MCL.png){ width=230px } |
-| ![monks-3_MSE](../results/monks_8_run/monks-3_MSE.png){ width=230px } | ![monks-3_MCL](../results/monks_8_run/monks-3_MCL.png){ width=230px } |
-| ![monks-3_reg_MSE](../results/monks_8_run/monks-3_reg_MSE.png){ width=230px } | ![monks-3_reg_MCL](../results/monks_8_run/monks-3_reg_MCL.png){ width=230px } |
+\newcommand{\monkwidth}{1.15\textwidth}
+\begin{figure}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-1_MSE.png}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-1_MCL.png}
+        \caption{Monks-1}\label{fig:monks-1}
+    \end{subfigure}}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-2_MSE.png}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-2_MCL.png}
+        \caption{Monks-2}\label{fig:monks-2}
+    \end{subfigure}}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-3_MSE.png}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-3_MCL.png}
+        \caption{Monks-3}\label{fig:monks-3}
+    \end{subfigure}}
+    \caption{Monks benchmark}\label{fig:monks}
+\end{figure}
+\begin{figure}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-3_reg_MSE.png}
+        \includegraphics[width=0.5\linewidth]{../results/monks_8_run/monks-3_reg_MCL.png}
+        \caption{Monks-3}\label{fig:monks-3}
+    \end{subfigure}}
+    \caption{Monks-3 with regularization}\label{fig:monks-3_reg}
+\end{figure}
 
 ## Cup Results
 
