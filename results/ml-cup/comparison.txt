@@ -8,12 +8,6 @@ exp11	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'miniba
 exp10	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.326901421142929} 1.3819000319571384
 exp03	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 201} 1.382572774888247
 exp02	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 227} 1.5636701584741604
-
-I risultati sono ordinati in ordine crescente per errore sul validation set ottenuto in CrossValidation.
-Vale la pena notare che quando il multilayer esce vincente è in ogni caso il peggiore di tutti gli esperimenti, prova che proviene da una scelta di grid sbagliata.
-I migliori risultati si hanno con un alto numero di unità, può quindi valere la pena provare anche numeri di unità più alti.
-
-I valori più alti sembrano essere incentivati dall'eta più grande, può essere dunque sensato provare ad aumentare oltre che la pazienza il tau.
 ----------------------------------
 Sat 25 Jan 2020 07:15:23 PM CET
 exp05	{'eta': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 100, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.001, 'target_loss': 1.0200159657711678} 1.0559765510456696
@@ -25,5 +19,15 @@ exp11	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'miniba
 exp10	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.326901421142929} 1.3819000319571384
 exp03	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 201} 1.382572774888247
 exp02	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 227} 1.5636701584741604
-
-In exp12 la curva è penalizzata da target loss, ci vorrebbe forse una certa tolleranza anche per quello?
+----------------------------------
+Sun 26 Jan 2020 01:54:35 PM CET
+exp05	{'eta': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 100, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.001, 'target_loss': 1.0200159657711678} 1.0559765510456696
+exp13	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 100, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 0.967405532960905} 1.0900084161861088
+exp04	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 0.9602777513246847} 1.1447615246868625
+exp01	{'eta': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 100, 'prefer_tr': False, 'topology': [20, 30, 2], 'weight_decay': 0.001, 'epochs': 237} 1.1643564529449015
+exp12	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 500, 'prefer_tr': False, 'tau': 500, 'topology': [20, 40, 2], 'weight_decay': 0.0001, 'target_loss': 1.1929934944886695} 1.329655189948993
+exp09	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'patience': 200, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'target_loss': 1.3208066744561446} 1.331388923881189
+exp11	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 500, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.3209513391509677} 1.3805071131148485
+exp10	{'eta': 0.001, 'eta_zero': 0.1, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.99, 'patience': 200, 'prefer_tr': False, 'tau': 200, 'topology': [20, 30, 2], 'weight_decay': 0.0001, 'target_loss': 1.326901421142929} 1.3819000319571384
+exp03	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 201} 1.382572774888247
+exp02	{'eta': 0.05, 'f_hidden': 'tanh', 'max_norm': 0, 'minibatch': 32, 'momentum': 0.9, 'patience': 100, 'prefer_tr': False, 'topology': [20, 10, 10, 2], 'weight_decay': 0.0001, 'epochs': 227} 1.5636701584741604
