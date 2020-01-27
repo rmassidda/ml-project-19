@@ -144,25 +144,42 @@ Table: (Experimental results over the MONK's datasets) \label{monks_results}
 ## Cup Results
 
 ### Screening
-Single layer sopra i 30, più alto meglio va.
+A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters that will be used for the grid search in the model selection phase.
+Some of the plots that we observed and discussed in the screening phase are resumed in the appendix figure \ref{app}.
 
-Momentum aiuta contro il noise, più alto megli è.
+The $\alpha$ value used to tune the momentum effect is more effective when near its maximum allowed value 1, whilst this can generate oscillations in the learning curve we have observed that when using big step size actually smoothers an otherwise noisy curve.
 
-Fissare minibatch e lavorare sull'eta.
+Different $\eta$ values for the fixed learning rate have been observed, we noticed that there is an obvious strict correlation between the $\eta$ value and the size of the minibatch used for learning.
+We decided to fix the minibatch size and so to investigate different $\eta$ values to improve the performances of the neural network, assuming a practically standard for the minibatch size as 32.
 
-$\eta$ decay dimostrate le intuizioni sul bengio.
+The bounds for decay learning rate are derived by the advises known in literature [@goodfellow_deep_2016] for the SGD algorithm, so we have been able to confirm a good number of iterations $\tau$ before fixing the learning rate in the order of a few hundreds and to find a good ratio between the initial $\eta_0$ and the final $\eta_\tau$ learning rates.
 
-$\lambda$ weight decay testato anche a zero dato che early stopping alternativa regolarizzazione, però si provano valori.
+The value $\lambda$ used for the regularization of the network has been considered effective for little values of the parameter, also considered the fact that early stopping itself is a regularization technique we admitted a case without $\lambda$ regularization at all.
 
-Funzione di attivazioni la tanh è migliore, relu anche senza max_norm non regge il confronto, sigmoid eliminata in fase di screening.
-Identità per l'output layer, siamo in regressione.
+Regarding the early stopping we have found an interesting trade-off for the patience parameter in a few hundreds of epoch, this choice is derived from the observation of the relationship between patience and number of epochs, and consequently patience and error on the experiment validation set.
+In particular we noticed that the number of epochs quickly grows linearly with the patience, while the error on the VL decreases more than linearly in respect to the patience.
 
-Patience intorno al 100 per motivazioni di screening.
+*TODO Hidden layer: activation function and number of units*.
+*Funzione di attivazioni la tanh è migliore, relu anche senza max_norm non regge il confronto, sigmoid eliminata in fase di screening.
+Identità per l'output layer, siamo in regressione.*
+
+These considerations lead to the final grid chose for the model selection that we recall in table \ref{grid_ranges}.
+The grid describes 108 possible combinations of hyperparameters, of which 72 with fixed learning rate and 36 with decaying learning rate.
 
 Table: (Range of hyperparameters used in the grid search) \label{grid_ranges}
 
-| Hyperparameter | Implementation | Values |
+| | Hyperparameter | Values |
 |--|--|--|
+|  | `topology` | [20,32,2],[20,64,2],[20,32,32,2] |
+| $f$  | `f_hidden` | tanh, ReLU |
+| $\eta$ | `eta` | 5e-2,1e-2 |
+| $\lambda$ | `weight_decay` | 1e-4,5e-5,0 |
+| $\alpha$ | `momentum` | 0.99,0.999 |
+|  | `minibatch` | 32 |
+|  | `patience` | 100 |
+| $\tau$ | `tau` | 200 |
+| $\eta_0$ | `eta_zero` | 0.1 |
+| $\eta_\tau$ | `eta` | 0.01 |
 
 ### Final model
 Scelta del modello finale secondo modello formale.
