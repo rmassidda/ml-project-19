@@ -1,0 +1,21 @@
+    common = {
+        'topology': [[20,32,2],[20,64,2],[20,32,32,2]],
+        'f_hidden': ['tanh','relu'],
+        'eta': [5e-2,1e-2],
+        'weight_decay': [1e-4,5e-5,0],
+        'momentum': [0.99,0.999],
+        'minibatch': [32],
+        'max_norm': [0],
+        'prefer_tr': [False],
+        'patience': [100]
+        }
+    decay_eta = {
+            'tau': [200],
+            'eta_zero': [0.1],
+            'eta': [0.01]
+        }
+
+    family = [
+            {**common},
+            {**common, **decay_eta}
+            ]

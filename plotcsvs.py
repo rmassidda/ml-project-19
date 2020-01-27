@@ -8,7 +8,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         filenames = sys.argv[1:]
     else:
-        filenames = ['rottenmeier_ML-CUP19-TS.csv']
+        filenames = ['results/ml-cup/exp_final/rottenmeier_ML-CUP19-TS.csv']
 
     plt.title('Blind test')
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     plt.cla()
     plt.clf()
 
-    loss_csv = 'loss.csv'
+    loss_csv = 'results/ml-cup/exp_final/loss.csv'
 
     plt.title('Risk estimation')
     epochs  = np.genfromtxt(loss_csv,delimiter=',',usecols=range(0,1))
