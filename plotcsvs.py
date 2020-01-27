@@ -24,3 +24,20 @@ if __name__ == '__main__':
 
     plt.legend()
     plt.show()
+    plt.cla()
+    plt.clf()
+
+    loss_csv = 'loss.csv'
+
+    plt.title('Risk estimation')
+    epochs  = np.genfromtxt(loss_csv,delimiter=',',usecols=range(0,1))
+    tr_loss = np.genfromtxt(loss_csv,delimiter=',',usecols=range(1,2))
+    ts_loss = np.genfromtxt(loss_csv,delimiter=',',usecols=range(2,3))
+
+    plt.plot(tr_loss, color="green", label='TR')
+    plt.plot(ts_loss, color="blue", label='TS', linewidth=2, linestyle=':')
+    plt.xlabel('Epoch')
+    plt.ylabel('MEE')
+    plt.legend()
+    plt.grid()
+    plt.show()
