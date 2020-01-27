@@ -73,7 +73,7 @@ This solution also leads to an implicit regularization of the model, avoiding th
 
 All of this techniques are bounded by a tunable maximum number of epochs, this is needed to avoid situations where there are no assurances about the effectiveness of the stopping criterion like in the case `b`.
 
-![Flow chart for the stopping conditions\label{stop_conditions}](stop_conditions.svg)
+![Flow chart for the stopping conditions\label{stop_conditions}](stop_conditions.svg){width=250px}
 
 ## Validation
 The lack of a reliable external test set led to the development of a strategy to assess the performances of the model by using an internal one.
@@ -144,35 +144,38 @@ Table: (Experimental results over the MONK's datasets) \label{monks_results}
 ## Cup Results
 
 ### Screening
-A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters that will be used for the grid search in the model selection phase.
-The result of this research is summarized in table \ref{grid_ranges}, while various plots of the learning curves we refer to can be found in the appendix.
+Single layer sopra i 30, più alto meglio va.
 
-Other then finding good fixed step size it has been experimentally verified that when using decaying step size an high initial value $\eta_0$ can lead to an oscillating behavior, despite respecting the ratio $\eta_\tau = \frac{\eta_0}{\tau}$ as advised[@goodfellow_deep_2016].
+Momentum aiuta contro il noise, più alto megli è.
 
-Another combination proven to produce a chaotic learning curve, due to the noise produced, is the binding of a relatively high learning rate with a small minibatch size, to avoid so we explore only models with a consistent size.
+Fissare minibatch e lavorare sull'eta.
 
-As expected we noticed the Tikhonov regularization (L2), $\lambda$, and the momentum $\alpha$ to be more effective respectively with values nearer to 0 for the former and to 1 for the latter.
+$\eta$ decay dimostrate le intuizioni sul bengio.
 
-For what concerns the activation functions we haven't been able to discriminate them in this phase, but we observed that the ReLU function caused numerical issues that lead to the introduction of gradient clipping.
+$\lambda$ weight decay testato anche a zero dato che early stopping alternativa regolarizzazione, però si provano valori.
 
-The number of units is also treated as an hyperparameter, we try different order of magnitude and also to use multiple layers.
+Funzione di attivazioni la tanh è migliore, relu anche senza max_norm non regge il confronto, sigmoid eliminata in fase di screening.
+Identità per l'output layer, siamo in regressione.
+
+Patience intorno al 100 per motivazioni di screening.
 
 Table: (Range of hyperparameters used in the grid search) \label{grid_ranges}
 
 | Hyperparameter | Implementation | Values |
 |--|--|--|
-| $\eta$ | `eta` | $0.5,0.1,0.05,0.01$ |
-| $\tau$ | `tau` | $100,200$ |
-| $\eta_0$ | `eta_zero` | $1\mathrm{e}{-10}$ |
-| $\lambda$ | `weight_decay` | $10^{-2}, 10^{-3}$ | 
-| $\alpha$ | `momentum` | $1-10^{-1}, 1-10^{-2}$ | 
 
-### Model selection
+### Final model
+Scelta del modello finale secondo modello formale.
 
-### Model assessment
+Commento sul modello risultante in base alle nozioni dallo screening e ai risultati sul test set.
+
+Commento sul grafico della stima del rischio.
+
+Commento sul grafico dell'output space.
 
 # Conclusions
 
+\newpage
 # References
 <div id="refs"></div>
 
