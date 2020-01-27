@@ -101,7 +101,15 @@ if __name__ == '__main__':
     plt.xlabel('Epoch')
     plt.ylabel('MEE')
     plt.legend()
-    plt.savefig('risk_estimation.png')
+    plt.grid()
+
+    plt.savefig('risk_estimation.png', dpi=300)
+    plt.clf()
+    plt.cla()
+
+    with open('loss.csv', 'w+') as fp:
+        for epoch in range(len(tr_loss[0])):
+            print(epoch,tr_loss[0][epoch],ts_loss[0][epoch],sep=',',file=fp)
 
     # Results for the blind test
     with open('rottenmeier_ML-CUP19-TS.csv', 'w+') as fp:
