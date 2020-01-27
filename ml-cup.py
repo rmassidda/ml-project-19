@@ -45,11 +45,11 @@ if __name__ == '__main__':
 
     # Hyperparameters
     common = {
-        'topology': [[20,32,15,2],[20,20,15,2],[20,30,10,2]],
-        'f_hidden': ['tanh'],
-        'eta': [0.01,0.005,0.001],
-        'weight_decay': [0.0001,0.00005,0.00001],
-        'momentum': [0.9],
+        'topology': [[20,32,2],[20,64,2],[20,32,32,2]],
+        'f_hidden': ['tanh','relu'],
+        'eta': [5e-2,1e-2],
+        'weight_decay': [1e-4,5e-5,0],
+        'momentum': [0.99,0.999],
         'minibatch': [32],
         'max_norm': [0],
         'prefer_tr': [False],
