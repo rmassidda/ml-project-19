@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     # Results for the blind test
     with open('cosmas_ML-CUP19-TS.csv', 'w+') as fp:
-        print('# Emanuele  Cosenza	Riccardo Massidda',file=fp)
+        print('# Emanuele Cosenza	Riccardo Massidda',file=fp)
         print('# cosmas',file=fp)
         print('# ML-CUP19',file=fp)
         print('# '+date.today().strftime("%d/%m/%Y"),file=fp)
