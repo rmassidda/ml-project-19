@@ -1,8 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor
 from matplotlib import pyplot as plt
 from network import Network
-from validation import Validation, cross_validation
-from grid import Grid
+from validation import Validation, cross_validation, Grid
 from random import sample
 import numpy as np
 import functools

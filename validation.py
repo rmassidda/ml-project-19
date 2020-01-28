@@ -1,9 +1,9 @@
 from concurrent.futures import ProcessPoolExecutor
-from grid import Grid
+from itertools import product
 from network import Network
 from utils import shuffle, loss_dict
-import numpy as np
 import functools
+import numpy as np
 import time
 
 """
@@ -47,6 +47,36 @@ def cross_validation(model,x,y,loss,k=5):
     period  = sum([period for tr_loss,vl_loss,epoch,period in folds])/k
 
     return (tr_loss,vl_loss,epoch,period)
+
+class Grid:
+    """
+    A list of dictionaries is used to represent a sequence of grids.
+    This data structure can be iterated to return all the possibile
+    combinations of values per dictionary.
+    """
+
+    def __init__(self, grid):
+        self.grid   = grid
+        self.length = 0
+        for d in self.grid:
+            items = sorted(d.items())
+            key, val = zip(*items)
+            for v in product(*val):
+                self.length += 1
+
+    def __iter__(self):
+        for d in self.grid:
+            # Sorted elements of the grid
+            items = sorted(d.items())
+            # Keys and values to combine
+            key, val = zip(*items)
+            # Cartesian product of the values
+            for v in product(*val):
+                # Return the assignment
+                yield dict(zip(key, v))
+
+    def __len__(self):
+        return self.length
 
 class Validation:
     def __init__(self,loss,workers=16,verbose=True):
