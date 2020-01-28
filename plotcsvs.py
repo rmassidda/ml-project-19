@@ -8,7 +8,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         filenames = sys.argv[1:]
     else:
-        filenames = ['results/ml-cup/exp_final/rottenmeier_ML-CUP19-TS.csv']
+        filenames = ['results/ml-cup/exp_final/cosmas_ML-CUP19-TS.csv']
 
     plt.title('Blind test')
 

@@ -112,9 +112,9 @@ if __name__ == '__main__':
             print(epoch,tr_loss[0][epoch],ts_loss[0][epoch],sep=',',file=fp)
 
     # Results for the blind test
-    with open('rottenmeier_ML-CUP19-TS.csv', 'w+') as fp:
+    with open('cosmas_ML-CUP19-TS.csv', 'w+') as fp:
         print('# Emanuele  Cosenza	Riccardo Massidda',file=fp)
-        print('# rottenmeier',file=fp)
+        print('# cosmas',file=fp)
         print('# ML-CUP19',file=fp)
         print('# '+date.today().strftime("%d/%m/%Y"),file=fp)
         for i in range(len(blind)):
