@@ -1,0 +1,1 @@
+Design and Python implementation of a multilayer perceptron with momentum and different regularization techniques to avoid overfitting issues.
