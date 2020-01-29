@@ -196,16 +196,26 @@ Table: (Results for the grid search. Only the first three models are reported, e
 | Winner | [20, 32, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $1*10^{-4}$ | 0.834 | 1.008 |
 | 2nd | [20, 32, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.836 | 1.013 |
 | 3rd | [20, 32, 32, 2] | $tanh$ | $1*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.924 | 1.024 |
+| 11th | [20, 32, 32, 2] | $relu$ | $5*10^{-2}$ | 0.99 | $5*10^{-4}$ | 0.914 | 1.061 |
+| 13rd | [20, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-4}$ | 0.952 | 1.063 |
 
 The topology [20, 32, 32, 2] was by far the most successful (the best network with a different topology finished in 13th position). Similarly, $tanh$ was by far the best hidden activation function (the best ReLU network placed 11th). Also, $\alpha=0.99$ happened to be a good value for the momentum parameter, while the $\eta$ parameter did not seem to be too decisive with respect to generalization capacity.
 
-Given the selected final model, we retrained it on the development set (80% of the data) and we then assessed it on the previously extracted internal test set (20% of the data). The plot relative to the final retraining, which contains TR and TS learning curves, is reported in Figure \ref{fig:risk_estimation}.
+Given the selected final model, we retrained it on the development set (80% of the data) and we then assessed it on the previously extracted internal test set (20% of the data).
+The plot relative to the final retraining, which contains TR and TS learning curves, is reported in Figure \ref{fig:risk_estimation}, while the MEE results on the overall validation process are in table \ref{result_table}.
+
+Table: (MEE for the chosen model over the various partitions of the dataset) \label{result_table}
+
+| TR | VL | TS |
+|----|----|----|
+| 0.834 | 1.008 | 1.019 |
 
 ![Learning curves (TR and TS) for the final retraining.\label{fig:risk_estimation}](risk_estimation.png){width=350px}
 
 The plot shows again that the selected model converges well on the training set, proving that the back-propagation algorithm has been implemented correctly. Also, the validation error goes down together with the training error, showing that the network is able to generalize on unseen data.
 
-The final trained model has been used to compute the final outputs for the blind test set. To check if the blind test set outputs were reasonable, we represented them as points in a 2D plot together with the training set outputs (\ref{app}). We found that the outputs of our final model lied near the curve identified by the training outputs, showing that the model approximated well the unknown function.
+The final trained model has been used to compute the final outputs for the blind test set.
+By representing them as points in the output space plot shown in figure \ref{fig:output_space_blind} in the appendix, we found that the outputs of our final model lied near the curve identified by the training outputs, showing that the model approximated well the unknown function.
 
 
 
@@ -225,6 +235,15 @@ Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening
 
 # Appendix
 
+## Output space
+\begin{figure}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+        \includegraphics[width=\linewidth]{../results/ml-cup/exp_final/training_blind.png}
+    \end{subfigure}}
+    \caption{Plot in the output space of the results on the blind test set.}\label{fig:output_space_blind}
+\end{figure}
+
 ## Screening
 
 "Fixed learning rate" consists of 8 models
@@ -242,7 +261,7 @@ Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening
 
 "Decay learning rate" consists of 4 models
 
-| Model | epochs | $\eta$ | $\eta_zero$ | $\tau$ | topology | MSE |
+| Model | epochs | $\eta$ | $\eta_0$ | $\tau$ | topology | MSE |
 |--|--|--|--|--|--|--|
 | 0 | 200 | 0.005 | 0.5 | 100 | [20 15 2] | 3.5727348531513345 |
 | 1 | 200 | 0.005 | 0.5 | 200 | [20 15 2] | 3.222256412989206 |
@@ -251,7 +270,7 @@ Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening
 
 "Oscillating decay learning rate" consists of 4 models
 
-| Model | epochs | $\eta$ | $\eta_zero$ | $\tau$ | topology | MSE |
+| Model | epochs | $\eta$ | $\eta_0$ | $\tau$ | topology | MSE |
 |--|--|--|--|--|--|--|
 | 0 | 200 | 0.05 | 5 | 100 | [20 15 2] | 1.7643450551336316e+36 |
 | 1 | 200 | 0.05 | 5 | 200 | [20 15 2] | 6.186715674416807e+90 |
