@@ -146,18 +146,18 @@ Table: (Experimental results over the MONK's datasets) \label{monks_results}
 
 ### Screening
 A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters used for the grid search in the model selection phase. 
-Some of the plots that we observed and discussed in the screening phase are resumed in the appendix figure \ref{app}.
+Some of the plots that we observed and discussed in the screening phase are resumed in the appendix.
 
 The $\alpha$ value used to tune the momentum effect is more effective when near its maximum allowed value, 1. While this can generate oscillations in the learning curve, we have observed that when using a big step size it actually smoothens an otherwise noisy curve.
 
 Different $\eta$ values for the fixed learning rate have been observed. We noticed that there is an obvious strict correlation between the $\eta$ value and the size of the minibatch used for learning.
-In order to get  e decided to fix the minibatch size and to vary $\eta$ to improve the performances of the neural network, assuming a practical standard for the minibatch size as 32.
+In order to study various configurations we decided to fix the minibatch size and to vary $\eta$ to improve the performances of the neural network, assuming a practical standard for the minibatch size as 32.
 
 To find reasonable bounds for the decaying learning rate, we took advice from literature [@goodfellow_deep_2016]. We have been able to confirm that good values for $\tau$, the number of iterations required before fixing the learning rate, are in the order of a few hundreds. We then found a good ratio between the initial $\eta_0$ and the final $\eta_\tau$ learning rate.
 
 The parameter $\lambda$ used for L2 regularization has been considered effective when set to small values. Considering the fact that early stopping is used as a stopping criterion in the model selection procedure, and the fact that early stopping is itself a regularization technique, we also allowed a zero value for $\lambda$ (no L2 regularization).
 
-Regarding the early stopping, we have found an interesting trade-off spot for the patience parameter in a few hundreds of epochs. This choice was derived from the observation of the relationship between patience and number of epochs and the relationship between patience and error on the experiment validation set.
+Regarding the early stopping, we have found an interesting trade-off for the patience parameter in a few hundreds of epochs. This choice was derived from the observation of the relationship between patience and number of epochs and the one between patience and error on the experiment validation set.
 In particular, we noticed that the number of epochs quickly grows linearly with the patience, while the error on the VL decreases more than linearly with respect to the patience.
 
 In order to obtain a grid of reasonable size, we narrowed the search for the hidden activation function to $tanh$ and ReLU. We chose to discard the standard logistic function, as it seemed to always converge slower than $tanh$ and ReLU.
@@ -222,4 +222,131 @@ Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening
 <div id="refs"></div>
 
 \newpage
+
 # Appendix
+
+## Screening
+
+"Fixed learning rate" consists of 8 models
+
+| Model | epochs | $\eta$ | topology | MSE |
+|--|--|--|--|--|
+| 0 | 200 | 1 | [20 15 2] | 15.295817557113532 |
+| 1 | 200 | 0.5 | [20 15 2] | 3.112441820482686 |
+| 2 | 200 | 0.1 | [20 15 2] | 2.2542645414631917 |
+| 3 | 200 | 0.05 | [20 15 2] | 2.521080318408892 |
+| 4 | 200 | 0.01 | [20 15 2] | 3.2346240986146078 |
+| 5 | 200 | 0.001 | [20 15 2] | 10.618540535255717 |
+| 6 | 200 | 0.0001 | [20 15 2] | 198.46763156549304 |
+| 7 | 200 | 1e-05 | [20 15 2] | 435.654983785013 |
+
+"Decay learning rate" consists of 4 models
+
+| Model | epochs | $\eta$ | $\eta_zero$ | $\tau$ | topology | MSE |
+|--|--|--|--|--|--|--|
+| 0 | 200 | 0.005 | 0.5 | 100 | [20 15 2] | 3.5727348531513345 |
+| 1 | 200 | 0.005 | 0.5 | 200 | [20 15 2] | 3.222256412989206 |
+| 2 | 200 | 0.001 | 0.1 | 100 | [20 15 2] | 4.136002939917029 |
+| 3 | 200 | 0.001 | 0.1 | 200 | [20 15 2] | 3.3292547553770895 |
+
+"Oscillating decay learning rate" consists of 4 models
+
+| Model | epochs | $\eta$ | $\eta_zero$ | $\tau$ | topology | MSE |
+|--|--|--|--|--|--|--|
+| 0 | 200 | 0.05 | 5 | 100 | [20 15 2] | 1.7643450551336316e+36 |
+| 1 | 200 | 0.05 | 5 | 200 | [20 15 2] | 6.186715674416807e+90 |
+| 2 | 200 | 0.01 | 1 | 100 | [20 15 2] | 5.068823772090453 |
+| 3 | 200 | 0.01 | 1 | 200 | [20 15 2] | 4.909584508252798 |
+
+"Minibatch-bigstep" consists of 4 models
+
+| Model | epochs | $\eta$ | minibatch | topology | MSE |
+|--|--|--|--|--|--|
+| 0 | 200 | 1 | 1 | [20 15 2] | 731.6221925869986 |
+| 1 | 200 | 1 | 4 | [20 15 2] | 306.35193748538717 |
+| 2 | 200 | 0.5 | 1 | [20 15 2] | 365.63750367443646 |
+| 3 | 200 | 0.5 | 4 | [20 15 2] | 180.22096643788132 |
+
+"Tikhonov regularization (L2)" consists of 5 models
+
+| Model | epochs | topology | $\lambda$ | MSE |
+|--|--|--|--|--|
+| 0 | 200 | [20 15 2] | 0 | 3.256676585056649 |
+| 1 | 200 | [20 15 2] | 0.1 | 73.46138718129757 |
+| 2 | 200 | [20 15 2] | 0.01 | 14.338679697054966 |
+| 3 | 200 | [20 15 2] | 0.001 | 3.9800649118526756 |
+| 4 | 200 | [20 15 2] | 0.0001 | 3.1959960722144527 |
+
+"Momentum" consists of 5 models
+
+| Model | epochs | $\alpha$ | topology | MSE |
+|--|--|--|--|--|
+| 0 | 200 | 0 | [20 15 2] | 3.2583345038923106 |
+| 1 | 200 | 0.5 | [20 15 2] | 3.172221208044486 |
+| 2 | 200 | 0.9 | [20 15 2] | 3.2819828404574456 |
+| 3 | 200 | 0.99 | [20 15 2] | 3.4393323598920507 |
+| 4 | 200 | 0.999 | [20 15 2] | 31.813636105146752 |
+
+"Gradient clipping" consists of 4 models
+
+| Model | epochs | max_norm | topology | MSE |
+|--|--|--|--|--|
+| 0 | 200 | 1 | [20 15 2] | 3.2479584177805774 |
+| 1 | 200 | 2 | [20 15 2] | 3.269801785468375 |
+| 2 | 200 | 10 | [20 15 2] | 3.357096724331396 |
+| 3 | 200 | 100 | [20 15 2] | 1.8067783005117501 |
+
+"Activation functions" consists of 3 models
+
+| Model | epochs | $f_h$ | topology | MSE |
+|--|--|--|--|--|
+| 0 | 200 | 'tanh' | [20 15 2] | 3.3506727028754204 |
+| 1 | 200 | 'sigmoid' | [20 15 2] | 4.30754127358549 |
+| 2 | 200 | 'relu' | [20 15 2] | 3.4702944013758112 |
+
+"Assess different values of patience," consists of 10 models
+
+| Model | patience | prefer_tr | topology | epochs | MSE |
+|--|--|--|--|--|--|
+| 0 | 1 | False | [20 15 2] | 39 | 13.649828858564003 |
+| 1 | 2 | False | [20 15 2] | 71 | 9.358610710765161 |
+| 2 | 4 | False | [20 15 2] | 154 | 3.7510464105064387 |
+| 3 | 8 | False | [20 15 2] | 207 | 3.564903922675451 |
+| 4 | 16 | False | [20 15 2] | 309 | 3.136955126870644 |
+| 5 | 32 | False | [20 15 2] | 236 | 3.136569191859081 |
+| 6 | 64 | False | [20 15 2] | 248 | 3.2515729733888405 |
+| 7 | 128 | False | [20 15 2] | 373 | 3.146595153279893 |
+| 8 | 256 | False | [20 15 2] | 563 | 3.085762997256863 |
+| 9 | 512 | False | [20 15 2] | 623 | 2.955754499161358 |
+
+"Topology" consists of 5 models
+
+| Model | epochs | $\eta$ | topology | MSE |
+|--|--|--|--|--|
+| 0 | 200 | 0.05 | [20 5 2] | 4.202882018807765 |
+| 1 | 200 | 0.05 | [20 32 2] | 2.2692850005667955 |
+| 2 | 200 | 0.05 | [20 64 2] | 2.2545935152610777 |
+| 3 | 200 | 0.05 | [20 32 32 2] | 1.9399796521701196 |
+| 4 | 200 | 0.05 | [20 32 32 32 2] | 2.0031332556940007 |
+
+\begin{figure}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_01.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_02.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_03.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_04.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_05.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_06.png}
+    \end{subfigure}}
+\end{figure}
+\begin{figure}
+    \makebox[\textwidth][c]{
+    \begin{subfigure}[b]{\monkwidth}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_07.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_08.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_09.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_10.png}
+      \includegraphics[width=0.5\linewidth]{../results/screening_8_run/screening_11.png}
+    \end{subfigure}}
+\end{figure}
