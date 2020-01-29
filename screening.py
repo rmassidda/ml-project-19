@@ -66,7 +66,8 @@ if __name__ == '__main__':
 
     # Define experiments
     experiments = []
-    experiments.append(Experiment('Fixed learning rate', [{**init, 'eta': [1,5e-1,1e-1,5e-2,1e-2,1e-3,1e-4,1e-5], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Topology', [{**init, 'eta':[0.05], 'topology': [[20,5,2],[20,32,2],[20,64,2],[20,32,32,2],[20,32,32,32,2]], 'epochs': [epoch]}]))
+    """ experiments.append(Experiment('Fixed learning rate', [{**init, 'eta': [1,5e-1,1e-1,5e-2,1e-2,1e-3,1e-4,1e-5], 'epochs': [epoch]}]))
     experiments.append(Experiment('Decay learning rate', [{**init, 'eta_zero': [5e-1], 'eta': [5e-3], 'tau': [100,200], 'epochs': [epoch]},
         {**init, 'eta_zero': [1e-1], 'eta': [1e-3], 'tau': [100,200], 'epochs': [epoch]},
         {**init, 'eta_zero': [1e-0], 'eta': [1e-2], 'tau': [100,200], 'epochs': [epoch]}]))
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     experiments.append(Experiment('Tikhonov regularization (L2)', [{**init, 'weight_decay': [0,1e-1,1e-2,1e-3,1e-4], 'epochs': [epoch]}]))
     experiments.append(Experiment('Momentum', [{**init, 'momentum': [0,0.5,0.9,0.99,0.999], 'epochs': [epoch]}]))
     experiments.append(Experiment('Gradient clipping', [{**init, 'max_norm': [1,2,10,100], 'epochs': [epoch]}]))
-    experiments.append(Experiment('Activation functions', [{**init, 'f_hidden': ['tanh','sigmoid','relu'], 'epochs': [epoch]}]))
+    experiments.append(Experiment('Activation functions', [{**init, 'f_hidden': ['tanh','sigmoid','relu'], 'epochs': [epoch]}])) """
 
     # Status
     print('Train set',len(train_x),len(train_x)/len(x),sep='\t')
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                     m=m,
                     x=train_x,
                     y=train_y)
-            seeds = np.random.randint(2**32, size=n_trials)
+            seeds = np.random.randint(2**32, size=n_trials, dtype='int64')
             res = executor.map(w,seeds)
 
             # Reduce
@@ -114,6 +115,7 @@ if __name__ == '__main__':
         plt.xlabel('Epoch')
         plt.ylabel('MSE')
         plt.legend()
+        plt.ylim(0,6)
         plt.savefig('screening_'+str(counter)+'.png', dpi=300)
 
         # Get ready for next experiment
@@ -121,7 +123,7 @@ if __name__ == '__main__':
         plt.cla()
         plt.clf()
 
-    # Special case to assess the patience
+"""     # Special case to assess the patience
     name = 'Assess different values of patience,'
     val  = Validation(['MEE'],workers=max_w)
     pat  = [1,2,4,8,16,32,64,128,256,512]
@@ -154,3 +156,4 @@ if __name__ == '__main__':
     plt.xlabel('Patience')
     plt.ylabel('epochs')
     plt.savefig('screening_'+str(counter)+'.png', dpi=300)
+ """

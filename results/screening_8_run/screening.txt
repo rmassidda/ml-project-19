@@ -54,6 +54,13 @@ Run of 8 experiments
 1 {'epochs': 200, 'f_hidden': 'sigmoid', 'topology': [20, 15, 2]} 4.30754127358549
 2 {'epochs': 200, 'f_hidden': 'relu', 'topology': [20, 15, 2]} 3.4702944013758112
 
+"Topology" consists of 5 models
+0 {'epochs': 200, 'eta': 0.05, 'topology': [20, 5, 2]} 4.202882018807765
+1 {'epochs': 200, 'eta': 0.05, 'topology': [20, 32, 2]} 2.2692850005667955
+2 {'epochs': 200, 'eta': 0.05, 'topology': [20, 64, 2]} 2.2545935152610777
+3 {'epochs': 200, 'eta': 0.05, 'topology': [20, 32, 32, 2]} 1.9399796521701196
+4 {'epochs': 200, 'eta': 0.05, 'topology': [20, 32, 32, 32, 2]} 2.0031332556940007
+
 "Assess different values of patience," consists of 10 models
 10-fold cross validation
 {'patience': 1, 'prefer_tr': False, 'topology': [20, 15, 2], 'epochs': 39}	13.649828858564003	13.069830217921984	1.0782448530197144

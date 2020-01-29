@@ -77,13 +77,14 @@ All of this techniques are bounded by a tunable maximum number of epochs, this i
 
 ## Validation
 The lack of a reliable external test set led to the development of a strategy to assess the performances of the model by using an internal one.
-Because of the explicit requirement to plot the learning curve of the selected final model against both the training and the test set, double cross validation has been avoided, since it produces only a scalar value representing the risk of the family of models.
+Because of the explicit requirement to plot the learning curve of the selected final model against both the training and the test set, double cross validation has been discarded as an assessment procedure, since it produces only a scalar value representing the risk of the family of models.
 Given this constraint in the validation procedure, the dataset is partitioned in development set and test set by random sampling without replacement in proportion $80/20\%$. The development set is then used for model selection purposes through a cross validation procedure, while the test set is used to assess the selected final model.
 
 The model selection follows a grid search approach, implemented in `grid.py` as a function capable to perform the Cartesian product over the set of relevant values for each hyperparameter, returning an iterable over all the sound combinations.
 The grid search is used for model selection, executing the $k$-fold cross validation algorithm implemented in `validation.py` for each possible combination.
-The implementation shuffles the data, uses by default $k=5$ folds over the development set, dividing it in training set and validation set, and finally returns the best hyperparameter selection.
-Given the final choice of hyperparameters, a new model is trained again by using the whole development set.
+The implementation shuffles the data, uses by default $k=5$ folds over the development set, dividing it in training set and validation set, and finally returns the best hyperparameter selection. The chosen model is that with the minimum average error on the validation sets. To take advantage of parallelism, trainings are executed simultaneously on all the available CPUs.
+
+Given a final choice of hyperparameters, a new model is trained again by using the whole development set. If the chosen model used early stopping as a stopping criterion in the model selection phase, then $\overline{ERR}_{TR}$, the average training error reached on the training sets, is computed. Then, the last training stops when an error of $\overline{ERR}_{TR}$ has been reached on the training set.
 
 By using the internal test partition extracted from the dataset, it is then possible to assess the final model and obtain the loss information needed to plot the learning curve of the model.
 
@@ -144,53 +145,79 @@ Table: (Experimental results over the MONK's datasets) \label{monks_results}
 ## Cup Results
 
 ### Screening
-A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters that will be used for the grid search in the model selection phase.
+A set of preliminary trials, some of which have been automated by the `screening.py` script, have been executed to identify sound ranges for the hyperparameters used for the grid search in the model selection phase. 
 Some of the plots that we observed and discussed in the screening phase are resumed in the appendix figure \ref{app}.
 
-The $\alpha$ value used to tune the momentum effect is more effective when near its maximum allowed value 1, whilst this can generate oscillations in the learning curve we have observed that when using big step size actually smoothers an otherwise noisy curve.
+The $\alpha$ value used to tune the momentum effect is more effective when near its maximum allowed value, 1. While this can generate oscillations in the learning curve, we have observed that when using a big step size it actually smoothens an otherwise noisy curve.
 
-Different $\eta$ values for the fixed learning rate have been observed, we noticed that there is an obvious strict correlation between the $\eta$ value and the size of the minibatch used for learning.
-We decided to fix the minibatch size and so to investigate different $\eta$ values to improve the performances of the neural network, assuming a practically standard for the minibatch size as 32.
+Different $\eta$ values for the fixed learning rate have been observed. We noticed that there is an obvious strict correlation between the $\eta$ value and the size of the minibatch used for learning.
+In order to get  e decided to fix the minibatch size and to vary $\eta$ to improve the performances of the neural network, assuming a practical standard for the minibatch size as 32.
 
-The bounds for decay learning rate are derived by the advises known in literature [@goodfellow_deep_2016] for the SGD algorithm, so we have been able to confirm a good number of iterations $\tau$ before fixing the learning rate in the order of a few hundreds and to find a good ratio between the initial $\eta_0$ and the final $\eta_\tau$ learning rates.
+To find reasonable bounds for the decaying learning rate, we took advice from literature [@goodfellow_deep_2016]. We have been able to confirm that good values for $\tau$, the number of iterations required before fixing the learning rate, are in the order of a few hundreds. We then found a good ratio between the initial $\eta_0$ and the final $\eta_\tau$ learning rate.
 
-The value $\lambda$ used for the regularization of the network has been considered effective for little values of the parameter, also considered the fact that early stopping itself is a regularization technique we admitted a case without $\lambda$ regularization at all.
+The parameter $\lambda$ used for L2 regularization has been considered effective when set to small values. Considering the fact that early stopping is used as a stopping criterion in the model selection procedure, and the fact that early stopping is itself a regularization technique, we also allowed a zero value for $\lambda$ (no L2 regularization).
 
-Regarding the early stopping we have found an interesting trade-off for the patience parameter in a few hundreds of epoch, this choice is derived from the observation of the relationship between patience and number of epochs, and consequently patience and error on the experiment validation set.
-In particular we noticed that the number of epochs quickly grows linearly with the patience, while the error on the VL decreases more than linearly in respect to the patience.
+Regarding the early stopping, we have found an interesting trade-off spot for the patience parameter in a few hundreds of epochs. This choice was derived from the observation of the relationship between patience and number of epochs and the relationship between patience and error on the experiment validation set.
+In particular, we noticed that the number of epochs quickly grows linearly with the patience, while the error on the VL decreases more than linearly with respect to the patience.
 
-*TODO Hidden layer: activation function and number of units*.
-*Funzione di attivazioni la tanh è migliore, relu anche senza max_norm non regge il confronto, sigmoid eliminata in fase di screening.
-Identità per l'output layer, siamo in regressione.*
+In order to obtain a grid of reasonable size, we narrowed the search for the hidden activation function to $tanh$ and ReLU. We chose to discard the standard logistic function, as it seemed to always converge slower than $tanh$ and ReLU.
+Since the \texttt{ML-CUP19} dataset offers a regression task, the identity function was considered as the only activation function in the output layer.
+Given the relative simplicity of the task at hand, we chose to consider only networks composed by one or two layers. To establish reasonable values for the number of units, we experimented with networks having a progressively higher number of units. In accordance to ML theory, we found the more complex networks to be more flexible than the simpler ones. At the end of this phase, we finally considered three different topologies: [20, 32, 2], [20, 64, 2] and [20, 32, 32, 2].
 
-These considerations lead to the final grid chose for the model selection that we recall in table \ref{grid_ranges}.
+These considerations lead to the final grid chosen for the model selection that we report in table \ref{grid_ranges}.
 The grid describes 108 possible combinations of hyperparameters, of which 72 with fixed learning rate and 36 with decaying learning rate.
 
 Table: (Range of hyperparameters used in the grid search) \label{grid_ranges}
 
 | | Hyperparameter | Values |
 |--|--|--|
-|  | `topology` | [20,32,2],[20,64,2],[20,32,32,2] |
+|  | `topology` | [20,32,2], [20,64,2], [20,32,32,2] |
 | $f$  | `f_hidden` | tanh, ReLU |
-| $\eta$ | `eta` | 5e-2,1e-2 |
-| $\lambda$ | `weight_decay` | 1e-4,5e-5,0 |
-| $\alpha$ | `momentum` | 0.99,0.999 |
+| $\eta$ | `eta` | $5*10^{-2}$, $1*10^{-2}$ |
+| $\lambda$ | `weight_decay` | $1*10^{-4}$, $5*10^{-5}$, 0 |
+| $\alpha$ | `momentum` | 0.99, 0.999 |
 |  | `minibatch` | 32 |
 |  | `patience` | 100 |
 | $\tau$ | `tau` | 200 |
 | $\eta_0$ | `eta_zero` | 0.1 |
 | $\eta_\tau$ | `eta` | 0.01 |
 
-### Final model
-Scelta del modello finale secondo modello formale.
+### Final model: selection, assessment and discussion
 
-Commento sul modello risultante in base alle nozioni dallo screening e ai risultati sul test set.
+After the screening phase and the grid building procedure, we proceeded to select a model and assess it through a final experiment. As any other experiment we did, this was executed on a machine with an 8 core CPU (Intel i7-8565U (8) @ 4.600GHz) and 8 Gb of RAM, granting a maximum parallelism degree of 8 in the cross validation.
 
-Commento sul grafico della stima del rischio.
+Following the formal procedure described in the validation section, a model has been chosen by means of a grid search using a 10-fold cross validation schema. The entire model selection took 4 hours and 40 minutes to finish. The average training time for a single model was 2 minutes.
+We report the grid search results for the three best models in Table \ref{grid_results}.
 
-Commento sul grafico dell'output space.
+Table: (Results for the grid search. Only the first three models are reported, each with its hyperparameters, training MEE and validation MEE. Training MEE and validation MEE are computed as averages on the 10 folds.) \label{grid_results}
+
+| | `topology` | $f$ | $\eta$ | $\alpha$ | $\lambda$ | TR MEE | VL MEE |
+|--|--|--|--|--|--|--|--|
+| Winner | [20, 32, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $1*10^{-4}$ | 0.834 | 1.008 |
+| 2nd | [20, 32, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.836 | 1.013 |
+| 3rd | [20, 32, 32, 2] | $tanh$ | $1*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.924 | 1.024 |
+
+The topology [20, 32, 32, 2] was by far the most successful (the best network with a different topology finished in 13th position). Similarly, $tanh$ was by far the best hidden activation function (the best ReLU network placed 11th). Also, $\alpha=0.99$ happened to be a good value for the momentum parameter, while the $\eta$ parameter did not seem to be too decisive with respect to generalization capacity.
+
+Given the selected final model, we retrained it on the development set (80% of the data) and we then assessed it on the previously extracted internal test set (20% of the data). The plot relative to the final retraining, which contains TR and TS learning curves, is reported in Figure \ref{fig:risk_estimation}.
+
+![Learning curves (TR and TS) for the final retraining.\label{fig:risk_estimation}](risk_estimation.png){width=350px}
+
+The plot shows again that the selected model converges well on the training set, proving that the back-propagation algorithm has been implemented correctly. Also, the validation error goes down together with the training error, showing that the network is able to generalize on unseen data.
+
+The final trained model has been used to compute the final outputs for the blind test set. To check if the blind test set outputs were reasonable, we represented them as points in a 2D plot together with the training set outputs (\ref{app}). We found that the outputs of our final model lied near the curve identified by the training outputs, showing that the model approximated well the unknown function.
+
+
 
 # Conclusions
+In this report we presented a NumPy implementation of a basic multilayer perceptron equipped with momentum, L2 regularization and various configurable stopping criteria, including early stopping. We reported the main design choices, describing the network structure and the main techniques involved in it.
+
+We then described the general procedures used to validate the network: for model selection we implemented a grid search procedure over a $k$-fold cross validation, while for model assessment we used a simple hold out division (80%/20%).
+
+We proved the proper functioning of the learning algorithm on the MONKS dataset, showing that the network can learn and generalize well in a classification task.
+
+Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening phase, we analysed the model behaviour under different circumstances on the regression dataset, doing various experiments to find good ranges for the tunable hyperparameters. At the end of this phase, we constructed a grid of hyperparameters, we built the best model out of it and we assessed the final model on an internal test set, giving an estimate of the performance of the network on the blind test set.
+
 
 \newpage
 # References
