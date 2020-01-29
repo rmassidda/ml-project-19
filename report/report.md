@@ -32,14 +32,14 @@ Implementing the network and the validation methods from the ground up has led t
 The proposed solution for the competition over the `ML-CUP19` dataset is a multilayer perceptron designed to be user configurable as much as possible, allowing a big variety of combinations to be tested independently.
 The learning algorithm is based on the backpropagation algorithm[@rumelhart_parallel_1986]. Variations have been introduced in the update rule to achieve regularization or to improve the overall performances.
 
-The network also offers the possibility of using early stopping as a stopping criterion, since it is a recognized regularization technique and, furthermore, it reduces the computational time by not learning for more epochs than required.
+The network also offers the possibility of early stopping since it is a recognized regularization technique and, furthermore, it reduces the computational time by not learning for more epochs than required.
 
 <!-- A mechanism that automatically executes a grid search over various hyperparameters combinations has been implemented to perform model selection. -->
 <!-- A model assessment procedure can then be executed by using a separate test set or by the double cross validation algorithm. -->
 <!-- To expect the achievement of generalization all of the experiments assume a certain degree of smoothness in the source producing the data, respecting so the inductive bias of neural networks --> 
 
 # Method
-For the implementation, Python has been chosen because of its simplicity and the efficiency of its numerical libraries.
+For the implementation, Python has been chosen because of its expressiveness and the efficiency of its numerical libraries.
 In particular, the implementation is based on NumPy[@oliphant_guide_2015], which has been used to efficiently manipulate data in form of vectors and matrices.
 Vectorization has been exploited to speed up the learning process.
 
@@ -47,13 +47,13 @@ Vectorization has been exploited to speed up the learning process.
 The `Network` class represents a neural network. By using its constructor it is possible to set all the required hyperparameters for the techniques that are later described.
 The class offers methods to learn from a set of examples via backpropagation and to predict outcomes for new patterns in forward mode.
 
-The initialization of the weights in each layer of the neural network is done by extracting values from a standard normal distribution with variance $\sigma = \frac{2}{n_i+n_o}$, where $n_i$ stands for the number of inputs in the considered layer and $n_o$ for the number of outputs.
+The initialization of the weights in each layer of the network is done by extracting values from a standard normal distribution with variance $\sigma = \frac{2}{n_i+n_o}$, where $n_i$ stands for the number of inputs in the considered layer and $n_o$ for the number of outputs.
 This has been proven to be a sound choice[@glorot_understanding_nodate] in various use cases.
 
 Different activation functions can be chosen for each layer of the neural network. The possible choices are: $tanh$, the standard logistic function, $ReLU$ and the identity function, thought to be used only in the output layer for regression tasks.
 
 The implemented backpropagation algorithm analyzes patterns by aggregating them using the minibatch technique.
-The batch size is a tunable hyperparameter with possible values between 1 (online training) and the size of the training set (batch training).
+The minibatch size is a tunable hyperparameter with possible values between 1 (online training) and the size of the training set (batch training).
 In the gradient descent algorithm, MSE is always used as the cost function.
 To speedup the computation, the update rule also considers momentum information, achieving convergence with a smaller number of epochs.
 Standard L2 regularization has also been implemented to avoid the overfitting of the training data.
@@ -64,31 +64,33 @@ This problem is dealt with by normalizing the gradient if it surpasses a certain
 The learning process can be terminated with different stopping criteria, as seen in figure \ref{stop_conditions}.
 The meaning of the different scenarios is the following:
 
-a. A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than the provided value.
-b. The training process is executed up to the loss on the training set reaches a certain provided value.
-c. Given a threshold value $t$, if the loss on the training set does not improve by at least $t$ for a fixed number of consecutive epochs, the learning process is stopped.
-This is equivalent to assert that the norm of the gradient in the SGD algorithm is stuck under a certain threshold.
+a. A fixed number of epochs can be provided as an hyperparameter, leading the network to be trained for no more than the given value.
+b. The training process is executed until the loss on the training set reaches a certain provided value.
+c. If the loss on the training set does not improve for a fixed number of consecutive epochs, the learning process is stopped.
 d. An early stopping mechanism is implemented by checking if the loss on a given validation set does not improve for a fixed number of consecutive epochs.
 This solution also leads to an implicit regularization of the model, avoiding the overfitting of the dataset[@prechelt_early_nodate].
 
 All of this techniques are bounded by a tunable maximum number of epochs, this is needed to avoid situations where there are no assurances about the effectiveness of the stopping criterion like in the case `b`.
 
-![Flow chart for the stopping conditions\label{stop_conditions}](stop_conditions.svg){width=250px}
+![Flow chart for the stopping conditions, the conditions are expressed using the namespace of the implementation.\label{stop_conditions}](stop_conditions.svg){width=250px}
 
 ## Validation
 The lack of a reliable external test set led to the development of a strategy to assess the performances of the model by using an internal one.
-Because of the explicit requirement to plot the learning curve of the selected final model against both the training and the test set, double cross validation has been discarded as an assessment procedure, since it produces only a scalar value representing the risk of the family of models.
-Given this constraint in the validation procedure, the dataset is partitioned in development set and test set by random sampling without replacement in proportion $80/20\%$. The development set is then used for model selection purposes through a cross validation procedure, while the test set is used to assess the selected final model.
+Because of the explicit requirement to plot the learning curve of the selected final model against both the training and the test set, double cross validation has been discarded as assessment procedure, since it produces only a scalar value representing the risk of the family of models.
+Given this constraint in the validation procedure, the dataset is partitioned in development set and test set by random sampling without replacement in proportion $80/20\%$.
 
-The model selection follows a grid search approach, implemented in `grid.py` as a function capable to perform the Cartesian product over the set of relevant values for each hyperparameter, returning an iterable over all the sound combinations.
-The grid search is used for model selection, executing the $k$-fold cross validation algorithm implemented in `validation.py` for each possible combination.
-The implementation shuffles the data, uses by default $k=5$ folds over the development set, dividing it in training set and validation set, and finally returns the best hyperparameter selection. The chosen model is that with the minimum average error on the validation sets. To take advantage of parallelism, trainings are executed simultaneously on all the available CPUs.
+The development set is then used for model selection purposes through a cross validation procedure, while the test set is used to assess the selected final model.
+All the validation methods hereby described are implemented in the `validation.py` script.
 
-Given a final choice of hyperparameters, a new model is trained again by using the whole development set. If the chosen model used early stopping as a stopping criterion in the model selection phase, then $\overline{ERR}_{TR}$, the average training error reached on the training sets, is computed. Then, the last training stops when an error of $\overline{ERR}_{TR}$ has been reached on the training set.
+The model selection follows a grid search approach implemented in the class `Grid`, capable to perform the Cartesian product over the set of relevant values for each hyperparameter, returning an iterable over all the sound combinations.
+The grid search is used for model selection, executing in parallel the $k$-fold cross validation algorithm for each generated assignment.
 
-By using the internal test partition extracted from the dataset, it is then possible to assess the final model and obtain the loss information needed to plot the learning curve of the model.
+Given the results of all the cross-validation executions the model with the minimum average error on the validation sets is chosen as the winner of the process.
+If early stopping was in use inside the cross-validation executions the average number of epochs reached or the average error on the training set is included to enable the final model to be retrained without a validation set.
 
-The mechanism hereby described is used in the script `ml-cup.py` to automatically perform model selection and assessment. In the same script, plots and results for the blind competition are produced.
+Once completed the model selection process, by using the internal test partition extracted from the dataset, it is then possible to assess the final model and obtain the loss information needed to plot the learning curve of the model.
+
+The mechanism hereby described is used in the script `ml-cup.py` to automatically perform model selection and assessment, in the same script, plots and results for the blind competition are produced.
 
 # Experiments
 
