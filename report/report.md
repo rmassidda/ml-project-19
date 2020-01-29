@@ -95,11 +95,9 @@ The mechanism hereby described is used in the script `ml-cup.py` to automaticall
 # Experiments
 
 ## MONK's dataset
-The results illustrated in table \ref{monks_results} are obtained by averaging eight independent runs for each task.
-In all the experiments, the employed neural networks are composed by a single hidden layer containing 4 hidden units.
-Since all three tasks are based on binary classification, the output layer is composed by a single unit with a standard logistic function as activation function.
-The network outputs are therefore in the range $(0, 1)$.
-To get the actual classification prediction, each output is then rounded up to the nearest integer (0 or 1).  In the hidden layer, $tanh$ is used as the activation function.
+The results illustrated in table \ref{monks_results} are obtained by averaging eight independent runs for each task as implemented in `monks.py` script.
+A single layer of four units with $tanh$ as the activation function has been used for all the experiments.
+The output layer is composed by a single unit with a standard logistic activation function, the classification is obtained by rounding up to the nearest integer.
 The networks have been trained for 2000 epochs by using a minibatch of 32 examples.
 No further techniques are used in the experiments in figure \ref{fig:monks}, Tikhonov regularization is used for the Monks-3 regularized experiment in figure \ref{fig:monks-3_reg}.
 
@@ -220,9 +218,8 @@ We proved the proper functioning of the learning algorithm on the MONKS dataset,
 
 Next, we focused on the proposed \texttt{ML-CUP19} competition. In the screening phase, we analysed the model behaviour under different circumstances on the regression dataset, doing various experiments to find good ranges for the tunable hyperparameters. At the end of this phase, we constructed a grid of hyperparameters, we built the best model out of it and we assessed the final model on an internal test set, giving an estimate of the performance of the network on the blind test set.
 
-
-\newpage
 # References
 <div id="refs"></div>
 
+\newpage
 # Appendix
