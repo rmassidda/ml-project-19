@@ -235,7 +235,6 @@ class Network:
             grad_w = [np.zeros(w.shape) for w in self.weights]
             grad_b = [np.zeros(b.shape) for b in self.biases]
             # Iterate over patterns
-            # TODO: vectorize
             for p in range(len(x_batch)):
                 # Do a forward pass and backpropagate the error
                 nets, activations = self.forward_pass(x_batch[p])
@@ -271,7 +270,6 @@ class Network:
         grad_w = [np.zeros(w.shape) for w in self.weights]
         grad_b = [np.zeros(b.shape) for b in self.biases]
         f = act_dict[self.activations[-1]]
-        # TODO: extend to other cost functions?
         delta = (y - activations[-1]) * f(nets[-1], True)
         # Compute gradients for the output layer
         grad_b[-1] = delta

@@ -149,10 +149,6 @@ class Validation:
 
         """
         The training and the validation curves of the model are returned.
-        NOTE: after the selection of the "best model" the
-        model selection could proceed with a finer coarse
-        grid search over smaller interval and within selected
-        hyperparameters.
         """
         return (model_tr,model_vl,model)
 
