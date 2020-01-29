@@ -186,7 +186,9 @@ Table: (Range of hyperparameters used in the grid search) \label{grid_ranges}
 
 After the screening phase and the grid building procedure, we proceeded to select a model and assess it through a final experiment. As any other experiment we did, this was executed on a machine with an 8 core CPU (Intel i7-8565U (8) @ 4.600GHz) and 8 Gb of RAM, granting a maximum parallelism degree of 8 in the cross validation.
 
-Following the formal procedure described in the validation section, a model has been chosen by means of a grid search using a 10-fold cross validation schema. The entire model selection took 4 hours and 40 minutes to finish. The average training time for a single model was 2 minutes.
+Following the formal procedure described in the validation section, a model has been chosen by means of a grid search using a 10-fold cross validation schema, returning the average of the TR loss as stopping condition for the retraining.
+The entire model selection took 4 hours and 40 minutes to finish.
+The average training time for a single model was 2 minutes.
 We report the grid search results for the three best models in Table \ref{grid_results}.
 
 Table: (Results for the grid search. Only the first three models are reported, each with its hyperparameters, training MEE and validation MEE. Training MEE and validation MEE are computed as averages on the 10 folds.) \label{grid_results}
@@ -204,7 +206,7 @@ The topology [20, 32, 32, 2] was by far the most successful (the best network wi
 Given the selected final model, we retrained it on the development set (80% of the data) and we then assessed it on the previously extracted internal test set (20% of the data).
 The plot relative to the final retraining, which contains TR and TS learning curves, is reported in Figure \ref{fig:risk_estimation}, while the MEE results on the overall validation process are in table \ref{result_table}.
 
-Table: (MEE for the chosen model over the various partitions of the dataset) \label{result_table}
+Table: (MEE for the chosen model over the partitions of the dataset) \label{result_table}
 
 | TR | VL | TS |
 |----|----|----|
@@ -216,8 +218,6 @@ The plot shows again that the selected model converges well on the training set,
 
 The final trained model has been used to compute the final outputs for the blind test set.
 By representing them as points in the output space plot shown in figure \ref{fig:output_space_blind} in the appendix, we found that the outputs of our final model lied near the curve identified by the training outputs, showing that the model approximated well the unknown function.
-
-
 
 # Conclusions
 In this report we presented a NumPy implementation of a basic multilayer perceptron equipped with momentum, L2 regularization and various configurable stopping criteria, including early stopping. We reported the main design choices, describing the network structure and the main techniques involved in it.
