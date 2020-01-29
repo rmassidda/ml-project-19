@@ -199,7 +199,7 @@ Table: (Results for the grid search. Only the first three models are reported, e
 | 2nd | [20, 32, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.836 | 1.013 |
 | 3rd | [20, 32, 32, 2] | $tanh$ | $1*10^{-2}$ | 0.99 | $5*10^{-5}$ | 0.924 | 1.024 |
 | 11th | [20, 32, 32, 2] | $relu$ | $5*10^{-2}$ | 0.99 | $5*10^{-4}$ | 0.914 | 1.061 |
-| 13rd | [20, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-4}$ | 0.952 | 1.063 |
+| 13th | [20, 32, 2] | $tanh$ | $5*10^{-2}$ | 0.99 | $5*10^{-4}$ | 0.952 | 1.063 |
 
 The topology [20, 32, 32, 2] was by far the most successful (the best network with a different topology finished in 13th position). Similarly, $tanh$ was by far the best hidden activation function (the best ReLU network placed 11th). Also, $\alpha=0.99$ happened to be a good value for the momentum parameter, while the $\eta$ parameter did not seem to be too decisive with respect to generalization capacity.
 
