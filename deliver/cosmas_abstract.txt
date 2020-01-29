@@ -1,1 +1,2 @@
 Design and Python implementation of a multilayer perceptron with momentum and different regularization techniques to avoid overfitting issues.
+The model selection and the assessment of the learning process on the \texttt{ML-CUP19} dataset are validated by using the cross validation method.

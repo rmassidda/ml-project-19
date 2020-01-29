@@ -10,10 +10,10 @@ mkdir -p deliver
 cp results/ml-cup/exp_final/$TEAM*.csv deliver/
 
 # Abstract
-cat report/report.md| grep abstract -A1 -m1 | tail -n1 >deliver/${TEAM}_abstract.txt
+cat report/report.md| grep abstract -A2 -m1 | tail -n2 >deliver/${TEAM}_abstract.txt
 
 # Code
-zip $PACKAGE activation.py grid.py ml-cup.py monks.py network.py screening.py utils.py validation.py requirements.txt data/{ML-CUP19,monks}*
+zip $PACKAGE activation.py ml-cup.py monks.py network.py screening.py utils.py validation.py requirements.txt data/{ML-CUP19,monks}*
 mv $PACKAGE deliver/
 
 # Report
