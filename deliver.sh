@@ -14,7 +14,11 @@ cat report/report.md| grep abstract -A2 -m1 | tail -n2 >deliver/${TEAM}_abstract
 
 # Code
 mkdir -p deliver/$CODE
-cp activation.py ml-cup.py monks.py network.py screening.py utils.py validation.py requirements.txt data/{ML-CUP19,monks/}* deliver/$CODE/
+mkdir -p deliver/$CODE/data
+mkdir -p deliver/$CODE/data/monks
+cp activation.py ml-cup.py monks.py network.py screening.py utils.py validation.py requirements.txt deliver/$CODE
+cp data/ML-CUP19* deliver/$CODE/data
+cp data/monks/* deliver/$CODE/data/monks
 
 # Report
 cd report
@@ -22,5 +26,5 @@ make
 cp report.pdf ../deliver/${TEAM}_report.pdf
 
 # Package
-cd ..
-zip -r $TEAM.zip deliver/*
+cd ../deliver
+zip -r ../$TEAM.zip *
